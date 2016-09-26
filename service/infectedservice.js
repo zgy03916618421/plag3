@@ -101,6 +101,6 @@ exports.speedv2 = function *(vid,userid) {
                 yield mongodb.collection('user').updateOne({'openid':path[i]},{$inc:{'balance':parseInt(50/(path.length-1))}});
             }
         }
-        return {'head':{code: 200,msg:'success'},'data':{balance:user[0].balance}};
+        return {'head':{code: 200,msg:'success'},'data':{balance:user[0].balance-100}};
     }
 }
