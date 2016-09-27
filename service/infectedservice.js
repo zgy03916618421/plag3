@@ -68,7 +68,9 @@ exports.disfavor = function *(userid,vid) {
 }
 exports.recharge = function *(money,userid) {
     yield mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':money*1000}});
+    var user = yield mongodb.collection('user').find({'openid':userid}).toArray();
     yield mongodb.collection('deallog').insertOne({'userid':userid,'price':money,'createtime':Date.parse(new Date())});
+    return user[0].balance;
 }
 exports.speedv2 = function *(vid,userid) {
     var user = yield mongodb.collection('user').find({'openid':userid}).toArray();
