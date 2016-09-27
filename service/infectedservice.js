@@ -51,7 +51,7 @@ exports.getVirus = function *(userid) {
         }
     }
 }
-exports.favor = function *(userid,vid) {
+exports.favor = function *(userid,vid,speed) {
     var doc = {};
     doc.orderid = md5(new Date().valueOf()+Math.random());
     doc.userid = userid;
