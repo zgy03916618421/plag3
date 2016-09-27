@@ -54,7 +54,6 @@ exports.createVirus = function *() {
     virus.vid = md5(new Date().valueOf()+Math.random());
     virus.createtime = Date.parse(new Date());
     mongodb.collection('virus').insertOne(virus);
-    //var speed = bodyparse.speed;
     var carryid = bodyparse.userid;
     var orderid = md5(new Date().valueOf()+Math.random());
     mongodb.collection('order').insertOne({
@@ -70,8 +69,7 @@ exports.createVirus = function *() {
         "vid":virus.vid,
         "infectid":carryid,
         "orderid":orderid,
-        'createtime':Date.parse(new Date()),
-        'source':true
+        'createtime':Date.parse(new Date())
     });
     this.body = {'head':{code: 300,msg:'success'}};
 }
@@ -96,7 +94,7 @@ exports.disfavor = function *() {
 exports.speed = function *() {
     var vid = this.request.body.vid;
     var userid = this.request.body.userid
-    var data = yield infectservice.speedV3(vid,userid);
+    var data = yield infectservice.speedV2(vid,userid);
     this.body = data;
 }
 exports.recharge = function *() {

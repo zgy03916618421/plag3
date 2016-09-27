@@ -60,10 +60,10 @@ exports.favor = function *(userid,vid,speed) {
     doc.speed = speed;
     doc.createtime = Date.parse(new Date());
     yield mongodb.collection('order').insertOne(doc);
-    yield mongodb.collection('action').insertOne({'userid':userid,'vid':vid,'action':'spread'});
+    yield mongodb.collection('action').insertOne({'userid':userid,'vid':vid,'action':'spread','createtime':Date.parse(new Date())});
 }
 exports.disfavor = function *(userid,vid) {
-    yield mongodb.collection('action').insertOne({'userid':userid,'vid':vid,'action':'skip'});
+    yield mongodb.collection('action').insertOne({'userid':userid,'vid':vid,'action':'skip','createtime':Date.parse(new Date())});
 }
 exports.recharge = function *(money,userid) {
     yield mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':money*10}});
@@ -121,6 +121,7 @@ exports.speedV3 = function *(vid,userid) {
         }
         console.log(orderids);
         var ids = underscore.uniq(orderids);
+        console.log(ids);
         var users = [];
         for(var m =0;m<ids.length;m++){
             var order = yield mongodb.collection('order').find({'orderid':ids[m]}).toArray();
@@ -143,4 +144,7 @@ exports.speedV3 = function *(vid,userid) {
 
         return {'head':{code: 200,msg:'success'},'data':{balance:user[0].balance-100}};
     }
+}
+exports.actionLog = function *(vid) {
+
 }
