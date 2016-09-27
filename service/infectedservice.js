@@ -112,11 +112,14 @@ exports.speedV3 = function *(vid,userid) {
         yield mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':-100}});
         var infect = yield mongodb.collection('infected').find({'vid':vid,'infectid':userid}).toArray();
         var time =infect[0].createtime;
+        console.log(time);
         var carriers = yield mongodb.collection('infected').find({'vid':vid,'createtime':{$lt:time}}).toArray();
+        console.log(carriers);
         var orderids = [];
         for (var i = 0;i<carriers.length;i++){
             orderids.push(carriers[i].orderid);
         }
+        console.log(orderids);
         var ids = underscore.uniq(orderids);
         var users = [];
         for(var m =0;m<ids.length;m++){
@@ -125,8 +128,10 @@ exports.speedV3 = function *(vid,userid) {
                 users.push(order[0].userid);
             }
         }
+        console.log(users);
         var source = yield mongodb.collection('virus').find({'vid':vid}).toArray();
         var sourceid = source[0].userid;
+        console.log(sourceid)
         if (!users.length){
             yield mongodb.collection('user').updateOne({'openid':sourceid},{$inc:{'income':100,'balance':100}});
         }else{
