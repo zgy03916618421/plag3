@@ -93,12 +93,11 @@ exports.speedv2 = function *(vid,userid) {
         }
         console.log(path);
         if(path.length ==1){
-            yield mongodb.collection('user').updateOne({'openid':path[0]},{$inc:{'balance':50}});
-            yield mongodb.collection('extragold').insertOne({'gold':50,'userid':path[0]});
+            yield mongodb.collection('user').updateOne({'openid':path[0]},{$inc:{'income':100}});
         }else{
-            yield mongodb.collection('user').updateOne({'openid':path[path.length-1]},{$inc:{'balance':50}})
+            yield mongodb.collection('user').updateOne({'openid':path[path.length-1]},{$inc:{'income':50}})
             for (var i =0;i<path.length-1;i++){
-                yield mongodb.collection('user').updateOne({'openid':path[i]},{$inc:{'balance':parseInt(50/(path.length-1))}});
+                yield mongodb.collection('user').updateOne({'openid':path[i]},{$inc:{'income':parseInt(50/(path.length-1))}});
             }
         }
         return {'head':{code: 200,msg:'success'},'data':{balance:user[0].balance-100}};

@@ -19,6 +19,7 @@ exports.oauth = function *() {
     if (!user.length){
         userinfo.createtime = Date.parse(new Date());
         userinfo.balance = 200;
+        userinfo.income = 0;
         mongodb.collection('user').insertOne(userinfo);
     }
     this.response.redirect(redircetUrl+'?userid='+userinfo.openid);
