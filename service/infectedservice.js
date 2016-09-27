@@ -67,7 +67,7 @@ exports.disfavor = function *(userid,vid) {
     yield mongodb.collection('action').insertOne({'userid':userid,'vid':vid,'action':'skip'});
 }
 exports.recharge = function *(money,userid) {
-    yield mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':money*1000}});
+    yield mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':money*10}});
     var user = yield mongodb.collection('user').find({'openid':userid}).toArray();
     yield mongodb.collection('deallog').insertOne({'userid':userid,'price':money,'createtime':Date.parse(new Date())});
     return user[0].balance;
