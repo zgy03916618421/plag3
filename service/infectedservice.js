@@ -35,8 +35,7 @@ exports.getVirus = function *(userid) {
             var selectOrder = underscore.sample(order);
             var doc = selectOrder;
             yield mongodb.collection('order').updateOne({'orderid':doc.orderid},{$set:{'fullfill':doc.fullfill+1}});
-            yield mongodb.collection('infected').insertOne({'carryid':doc.userid,'vid':virusid,'infectid':userid,'orderid':doc.orderid});
-
+            yield mongodb.collection('infected').insertOne({'carryid':doc.userid,'vid':virusid,'infectid':userid,'orderid':doc.orderid,'createtime':Date.parse(new Date())});
             var virus = yield mongodb.collection('virus').find({'vid':virusid}).toArray();
             var userinfo = yield mongodb.collection('user').find({'openid':virus[0].userid}).toArray();
             var patients = yield mongodb.collection('infected').find({'vid':virusid}).toArray();
@@ -95,13 +94,48 @@ exports.speedv2 = function *(vid,userid) {
         }
         console.log(path);
         if(path.length ==1){
-            yield mongodb.collection('user').updateOne({'openid':path[0]},{$inc:{'income':100}});
+            yield mongodb.collection('user').updateOne({'openid':path[0]},{$inc:{'income':100,'balance':100}});
         }else{
-            yield mongodb.collection('user').updateOne({'openid':path[path.length-1]},{$inc:{'income':50}})
+            yield mongodb.collection('user').updateOne({'openid':path[path.length-1]},{$inc:{'income':50,'balance':50}});
             for (var i =0;i<path.length-1;i++){
-                yield mongodb.collection('user').updateOne({'openid':path[i]},{$inc:{'income':parseInt(50/(path.length-1))}});
+                yield mongodb.collection('user').updateOne({'openid':path[i]},{$inc:{'income':parseInt(50/(path.length-1)),'balance':parseInt(50/(path.length-1))}});
             }
         }
+        return {'head':{code: 200,msg:'success'},'data':{balance:user[0].balance-100}};
+    }
+}
+exports.speedV3 = function *(vid,userid) {
+    var user = yield mongodb.collection('user').find({'openid':userid}).toArray();
+    if(user[0].balance < 100){
+        return {'head':{code:600,msg:'no balance'},'data':{balance:user[0].balance}};
+    }else{
+        yield mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':-100}});
+        var infect = yield mongodb.collection('infected').find({'vid':vid,'infectid':userid}).toArray();
+        var time =infect[0].createtime;
+        var carriers = yield mongodb.collection('infected').find({'vid':vid,'createtime':{$lt:time}}).toArray();
+        var orderids = [];
+        for (var i = 0;i<carriers.length;i++){
+            orderids.push(carriers[i].orderid);
+        }
+        var ids = underscore.uniq(orderids);
+        var users = [];
+        for(var m =0;m<ids.length;m++){
+            var order = yield mongodb.collection('order').find({'orderid':ids[m]}).toArray();
+            if(order[0].speed){
+                users.push(order[0].userid);
+            }
+        }
+        var source = yield mongodb.collection('virus').find({'vid':vid}).toArray();
+        var sourceid = source[0].userid;
+        if (!users.length){
+            yield mongodb.collection('user').updateOne({'openid':sourceid},{$inc:{'income':100,'balance':100}});
+        }else{
+            yield mongodb.collection('user').updateOne({'openid':sourceid},{$inc:{'income':50,'balance':50}});
+            for (var n =0;n<users.length;n++){
+                yield mongodb.collection('user').updateOne({'openid':users[n]},{$inc:{'income':parseInt(50/(users.length)),'balance':parseInt(50/(users.length))}});
+            }
+        }
+
         return {'head':{code: 200,msg:'success'},'data':{balance:user[0].balance-100}};
     }
 }

@@ -65,7 +65,14 @@ exports.createVirus = function *() {
         "fullfill" : 0,
         "speed" :false
     })
-    mongodb.collection('infected').insertOne({"carryid":carryid,"vid":virus.vid,"infectid":carryid,"orderid":orderid});
+    mongodb.collection('infected').insertOne({
+        "carryid":carryid,
+        "vid":virus.vid,
+        "infectid":carryid,
+        "orderid":orderid,
+        'createtime':Date.parse(new Date()),
+        'source':true
+    });
     this.body = {'head':{code: 300,msg:'success'}};
 }
 exports.fightVirus = function *() {
@@ -89,7 +96,7 @@ exports.disfavor = function *() {
 exports.speed = function *() {
     var vid = this.request.body.vid;
     var userid = this.request.body.userid
-    var data = yield infectservice.speedv2(vid,userid);
+    var data = yield infectservice.speedv3(vid,userid);
     this.body = data;
 }
 exports.recharge = function *() {
