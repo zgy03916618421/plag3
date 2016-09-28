@@ -56,6 +56,7 @@ exports.createVirus = function *() {
     mongodb.collection('virus').insertOne(virus);
     var carryid = bodyparse.userid;
     var orderid = md5(new Date().valueOf()+Math.random());
+    mongodb.collection('user').updateOne({'openid':userid},{$inc:{'viruscount':1}});
     mongodb.collection('order').insertOne({
         "orderid":orderid,
         "userid" : carryid,

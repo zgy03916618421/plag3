@@ -39,12 +39,15 @@ exports.getVirus = function *(userid) {
             var virus = yield mongodb.collection('virus').find({'vid':virusid}).toArray();
             var userinfo = yield mongodb.collection('user').find({'openid':virus[0].userid}).toArray();
             var patients = yield mongodb.collection('infected').find({'vid':virusid}).toArray();
+            var favor = yield mongodb.collection('action').find({'vid':virusid,'action':'spread'}).toArray();
+            var favorCount = favor.length;
             var patientNumber = patients.length;
             var data ={};
             //  data.order = doc
             data.virus = virus[0];
             data.userinfo = userinfo[0];
             data.patientNumber = patientNumber;
+            data.favorCount = favorCount;
             return {'head':{code:200,msg:'success'},'data':data};
         }else{
             return {'head':{code: 1000,msg:'no virus'}};
