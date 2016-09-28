@@ -120,7 +120,7 @@ exports.speedV3 = function *(vid,userid) {
         var users = [];
         for (var cid=0;cid<carriers.length;cid ++){
              var order = yield mongodb.collection('order').find({'vid':vid,'userid':carriers[cid].infectid}).toArray();
-            if(!order.length&&order[0].speed){
+            if(order.length&&order[0].speed){
                     users.push(order.userid);
             }
             }
