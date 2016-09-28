@@ -20,6 +20,7 @@ exports.oauth = function *() {
         userinfo.createtime = Date.parse(new Date());
         userinfo.balance = 200;
         userinfo.income = 0;
+        userinfo.viruscount = 0;
         mongodb.collection('user').insertOne(userinfo);
     }
     this.response.redirect(redircetUrl+'?userid='+userinfo.openid);
@@ -95,7 +96,7 @@ exports.disfavor = function *() {
 exports.speed = function *() {
     var vid = this.request.body.vid;
     var userid = this.request.body.userid
-    var data = yield infectservice.speedv2(vid,userid);
+    var data = yield infectservice.speedV3(vid,userid);
     this.body = data;
 }
 exports.recharge = function *() {
