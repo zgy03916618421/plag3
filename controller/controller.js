@@ -95,7 +95,7 @@ exports.disfavor = function *() {
 exports.speed = function *() {
     var vid = this.request.body.vid;
     var userid = this.request.body.userid
-    var data = yield infectservice.speedV3(vid,userid);
+    var data = yield infectservice.speedv2(vid,userid);
     this.body = data;
 }
 exports.recharge = function *() {
