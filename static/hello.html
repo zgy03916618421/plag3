@@ -30,7 +30,7 @@
        var vid = $("#vid").val();
         console.log(vid);
         $.getJSON(
-                "http://localhost:10000/tree/" + vid,
+                "https://dev-facebook.beautifulreading.com/tree/" + vid,
                 {format : 'json'},
                 function (res) {
                     var treeData = res;
