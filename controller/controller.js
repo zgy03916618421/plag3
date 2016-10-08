@@ -32,7 +32,9 @@ exports.upPic = function *() {
             var part;
             while (part = yield parts){
                 if (part != undefined){
-                    var name = md5(new Date().valueOf()+Math.random());
+                    var names = part.filename.split('.'),
+                        ext = names[names.length-1];
+                    var name = md5(new Date().valueOf()+Math.random())+'.'+ext;
                     var rs = yield qiniuUtil.pipe(name,part);
                     var url = qiniuUtil.qiniuhost + name;
                 }
@@ -77,7 +79,7 @@ exports.createVirus = function *() {
 }
 exports.fightVirus = function *() {
     var userid = this.params.userid;
-    var data = yield infectservice.getVirus(userid);
+    var data = yield infectservice.getVirusV2(userid);
     this.body = data;
 }
 exports.favor = function *() {
@@ -96,7 +98,7 @@ exports.disfavor = function *() {
 exports.speed = function *() {
     var vid = this.request.body.vid;
     var userid = this.request.body.userid
-    var data = yield infectservice.speedV3(vid,userid);
+    var data = yield infectservice.speedV4(vid,userid);
     this.body = data;
 }
 exports.recharge = function *() {
@@ -109,4 +111,18 @@ exports.getUserInfo = function *() {
     var userid = this.params.userid;
     var userinfo = yield  mongodb.collection('user').find({'openid':userid}).toArray();
     this.body = {'head':{code:200,msg:'success'},'data':userinfo[0]}
+}
+exports.path = function *() {
+    var vid = this.params.vid;
+    var userid = this.params.userid;
+    console.log(vid);
+    console.log(userid);
+    var path = yield infectservice.path(vid,userid);
+    this.body = {'path':path};
+}
+exports.tree = function *() {
+    var vid = this.params.vid;
+    console.log(vid);
+    var data = yield infectservice.tree(vid);
+    this.body = data;
 }

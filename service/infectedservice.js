@@ -3,6 +3,7 @@
  */
 var md5 = require('MD5')
 var underscore = require('underscore');
+var co = require('co');
 exports.getVirus = function *(userid) {
     var total = yield mongodb.collection('order').find().toArray();
     var orders = underscore.filter(total,function (data) {
@@ -143,4 +144,103 @@ exports.speedV3 = function *(vid,userid) {
 }
 exports.actionLog = function *(vid) {
 
+}
+exports.getVirusV2 = function *(userid) {
+    var infects = yield mongodb.collection('infected').find({$or: [{infectid: userid}, {carryid: userid}]}, {vid: 1}).toArray();
+    var ifs = infects.map(function (doc) {
+        return doc.vid;
+    })
+    var order = yield mongodb.collection('order').findOne({$and: [{vid: {$nin: ifs}},
+        {$or: [{$and: [{speed: true}, {fullfill: {$lt: 16}}]},
+            {$and: [{speed: false}, {fullfill: {$lt: 4}}]}
+        ]}]}
+    );
+    if (!order){
+        var data = {'head':{code: 1000,msg:'no virus'}};
+        return data
+    }else{
+       //yield mongodb.collection('order').updateOne({'orderid':order.orderid},{$inc:{'fullfill':1}});
+       // yield mongodb.collection('infected').insertOne({'carryid':order.userid,'vid':order.vid,'infectid':userid,'orderid':order.orderid,'createtime':Date.parse(new Date())});
+        var virus = yield mongodb.collection('virus').findOne({'vid':order.vid});
+        var userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
+        //var patients = yield mongodb.collection('infected').find({'vid':order.vid}).toArray();
+        var patients = yield mongodb.collection('infected').aggregate([
+            {$match:{"vid":order.vid}},
+            {$group:{"_id":null,"count":{$sum:1}}}
+        ]).toArray()
+        var favor = yield mongodb.collection('action').find({'vid':order.vid,'action':'spread'}).toArray();
+        var favorCount = favor.length;
+        var patientNumber = patients.length;
+        var data ={};
+        data.virus = virus;
+        data.userinfo = userinfo;
+        data.patientNumber = patients[0].count;
+        data.favorCount = favorCount;
+        return {'head':{code:200,msg:'success'},'data':data};
+    }
+}
+exports.speedV4 = function *(vid,userid) {
+    var user = yield mongodb.collection('user').findOne({'openid':userid});
+    if(user.balance < 100){
+        return {'head':{code:600,msg:'no balance'},'data':{balance:user.balance}};
+    }else{
+        mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':-100}});
+        var time = Date.parse(new Date());
+        var users = yield mongodb.collection('order').find({$and:[{vid:vid},{speed:true},{createtime:{$lt:time}}]},{userid:1}).toArray();
+        var us = users.map(function (doc) {
+            return doc.userid;
+        })
+        var source = yield mongodb.collection('virus').findOne({'vid':vid});
+        if(us.length){
+            yield mongodb.collection('user').updateMany({'openid':{$in:us}},{$inc:{'income':parseInt(50/(users.length)),'balance':parseInt(50/(users.length))}});
+            yield mongodb.collection('user').updateOne({'openid':source.userid},{$inc:{'income':50,'balance':50}});
+        }else{
+            yield mongodb.collection('user').updateOne({'openid':source.userid},{$inc:{'income':100,'balance':100}});
+        }
+
+    }
+}
+exports.path = function *(vid,userid) {
+    var path= [];
+    path.push(userid);
+    while (1){
+        var parentInfect = yield mongodb.collection('infected').findOne({'infectid':userid,'vid':vid});
+        if(parentInfect.carryid == parentInfect.infectid){
+            break;
+        }
+        path.push(parentInfect.carryid);
+        userid = parentInfect.carryid;
+    }
+    return path
+}
+exports.tree = function *(vid) {
+    var data = yield mongodb.collection('infected').aggregate([
+        {$match:{'vid':vid}},
+        {$project:{'name':"$infectid",'parent':'$carryid','_id':0}}
+    ]).toArray();
+    var data1 = data.map(function (item) {
+        if(item.name==item.parent){
+            delete  item.parent
+        }
+    })
+    console.log(data);
+    var dataMap = data.reduce(function(map, node) {
+        map[node.name] = node;
+        return map;
+    }, {});
+    var treeData = [];
+    for(var i =0;i <data.length; i ++){
+        var parent = dataMap[data[i].parent];
+        if (parent) {
+            // create child array if it doesn't exist
+            (parent.children || (parent.children = []))
+            // add node to child array
+                .push(data[i]);
+        } else {
+            // parent is null or missing
+            treeData.push(data[i]);
+        }
+    }
+    return treeData;
+    
 }
