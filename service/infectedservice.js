@@ -2,8 +2,7 @@
  * Created by Administrator on 2016/9/21.
  */
 var md5 = require('MD5')
-var underscore = require('underscore');
-var co = require('co');
+var underscore = require('underscore')
 exports.getVirus = function *(userid) {
     var total = yield mongodb.collection('order').find().toArray();
     var orders = underscore.filter(total,function (data) {
@@ -167,7 +166,7 @@ exports.getVirusV2 = function *(userid) {
         var patients = yield mongodb.collection('infected').aggregate([
             {$match:{"vid":order.vid}},
             {$group:{"_id":null,"count":{$sum:1}}}
-        ]).toArray()
+        ]).toArray();
         var favor = yield mongodb.collection('action').find({'vid':order.vid,'action':'spread'}).toArray();
         var favorCount = favor.length;
         var patientNumber = patients.length;
@@ -243,4 +242,27 @@ exports.tree = function *(vid) {
     }
     return treeData;
     
+}
+exports.share = function *(userid,vid) {
+
+}
+exports.getshareVirus = function *(carryid,vid,userid) {
+    var virus = yield mongodb.collection('virus').findOne({'vid':vid});
+    var userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
+    var patients = yield mongodb.collection('infected').aggregate([
+        {$match:{"vid":vid}},
+        {$group:{"_id":null,"count":{$sum:1}}}
+    ]).toArray();
+    var favor = yield mongodb.collection('action').aggregate([
+        {$match:{"vid":vid,'action':'spread'}},
+        {$group:{'_id':null,'count':{$sum:1}}}
+    ]).toArray();
+    var carry = yield mongodb.collection('user').findOne({'_id':carryid});
+     mongodb.collection('shareinfected').insertOne({'carryid':carry.openid,'vid':vid,'infectid':userid,'createtime':Date.parse(new Date())});
+    var data = {};
+    data.virus = virus;
+    data.userinfo = userinfo;
+    data.patientNumber = patients[0].count;
+    data.favorCount = favor[0].count;
+    return {'head':{code:200,msg:'success'},'data':data};
 }

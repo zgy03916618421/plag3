@@ -126,3 +126,9 @@ exports.tree = function *() {
     var data = yield infectservice.tree(vid);
     this.body = data;
 }
+exports.shareVirus = function *() {
+    var vid = this.params.vid;
+    var carryid = this.params.carryid;
+    var userid = this.params.userid;
+    var data = yield infectservice.getshareVirus(carryid,vid,userid);
+}

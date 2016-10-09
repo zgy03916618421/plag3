@@ -16,4 +16,5 @@ router.post('/recharge',C.recharge);
 router.get('/getuser/:userid',C.getUserInfo)
 router.get('/path/:userid/:vid',C.path);
 router.get('/tree/:vid',C.tree);
+router.get('/getshare/:carryid/:vid/:userid',C.shareVirus);
 module.exports = router
