@@ -249,21 +249,15 @@ exports.share = function *(userid,vid) {
 exports.getshareVirus = function *(carryid,vid,userid) {
     var virus = yield mongodb.collection('virus').findOne({'vid':vid});
     var userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
-    var patients = yield mongodb.collection('infected').aggregate([
-        {$match:{"vid":vid}},
-        {$group:{"_id":null,"count":{$sum:1}}}
-    ]).toArray();
-    var favor = yield mongodb.collection('action').aggregate([
-        {$match:{"vid":vid,'action':'spread'}},
-        {$group:{'_id':null,'count':{$sum:1}}}
-    ]).toArray();
-    var carry = yield mongodb.collection('user').findOne({'_id':ObjectID.createFromHexString(carryid)});
+    var patients = yield mongodb.collection('infected').find({'vid':order.vid}).toArray();
+    var favor = yield mongodb.collection('action').find({'vid':order.vid,'action':'spread'}).toArray();
+    var carry = yield mongodb.collection('user').findOne({'_id':ObjectID.createFromHexString(carryid)}).toArray();
     console.log(carry);
     mongodb.collection('shareinfected').insertOne({'carryid':carry.openid,'vid':vid,'infectid':userid,'createtime':Date.parse(new Date())});
     var data = {};
     data.virus = virus;
     data.userinfo = userinfo;
-    data.patientNumber = patients[0].count;
-    data.favorCount = favor[0].count;
+    data.patientNumber = patients.length;
+    data.favorCount = favor.length;
     return {'head':{code:200,msg:'success'},'data':data};
 }
