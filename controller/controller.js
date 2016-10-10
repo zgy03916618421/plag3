@@ -26,8 +26,12 @@ exports.oauth = function *() {
         userinfo.viruscount = 0;
         mongodb.collection('user').insertOne(userinfo);
     }
-    this.response.redirect(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.openid+'&vid='+vid+'&_id='+_id);
-
+    if(redircetUrl.length<6){
+        this.response.redact(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.openid);
+    }else{
+        this.response.redirect(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.openid+'&vid='+vid+'&_id='+_id);
+    }
+    
 }
 exports.upPic = function *() {
         try{

@@ -169,8 +169,7 @@ exports.getVirusV2 = function *(userid) {
             {$group:{"_id":null,"count":{$sum:1}}}
         ]).toArray();
         var favor = yield mongodb.collection('action').find({'vid':order.vid,'action':'spread'}).toArray();
-        var favorCount = favor.length;
-        var patientNumber = patients.length;
+
         var data ={};
         data.virus = virus;
         data.userinfo = userinfo;
