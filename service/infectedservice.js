@@ -159,8 +159,8 @@ exports.getVirusV2 = function *(userid) {
         var data = {'head':{code: 1000,msg:'no virus'}};
         return data
     }else{
-       //yield mongodb.collection('order').updateOne({'orderid':order.orderid},{$inc:{'fullfill':1}});
-       // yield mongodb.collection('infected').insertOne({'carryid':order.userid,'vid':order.vid,'infectid':userid,'orderid':order.orderid,'createtime':Date.parse(new Date())});
+       yield mongodb.collection('order').updateOne({'orderid':order.orderid},{$inc:{'fullfill':1}});
+       yield mongodb.collection('infected').insertOne({'carryid':order.userid,'vid':order.vid,'infectid':userid,'orderid':order.orderid,'createtime':Date.parse(new Date())});
         var virus = yield mongodb.collection('virus').findOne({'vid':order.vid});
         var userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
         //var patients = yield mongodb.collection('infected').find({'vid':order.vid}).toArray();
