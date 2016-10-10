@@ -23,7 +23,7 @@ exports.oauth = function *() {
         userinfo.viruscount = 0;
         mongodb.collection('user').insertOne(userinfo);
     }
-    this.response.redirect(redircetUrl+'?userid='+userinfo.openid);
+    this.response.redirect(redircetUrl+'&userid='+userinfo.openid);
 
 }
 exports.upPic = function *() {
