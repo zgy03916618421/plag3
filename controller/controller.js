@@ -10,6 +10,9 @@ var infectservice = require('../service/infectedservice');
 exports.oauth = function *() {
     var code = this.query.code;
     var redircetUrl = this.query.state;
+    redircetUrl = redircetUrl.split("/");
+    var _id = redircetUrl[3];
+    var vid = redircetUrl[4];
     console.log(redircetUrl);
     var token = yield client.getAccessToken(code);
     var accessToken = token.data.access_token;
@@ -23,7 +26,7 @@ exports.oauth = function *() {
         userinfo.viruscount = 0;
         mongodb.collection('user').insertOne(userinfo);
     }
-    this.response.redirect(redircetUrl+'/'+userinfo.openid);
+    this.response.redirect(redircetUrl[0]+'/'+redircetUrl[1]+'/'+redircetUrl[2]+'/'+'?userid='+userinfo.openid+'&vid='+vid+'&_id='+_id);
 
 }
 exports.upPic = function *() {
