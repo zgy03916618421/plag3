@@ -27,11 +27,11 @@ exports.oauth = function *() {
         mongodb.collection('user').insertOne(userinfo);
     }
     if(redircetUrl.length<6){
-        this.response.redact(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.openid);
+        this.response.redirect(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.openid);
     }else{
         this.response.redirect(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.openid+'&vid='+vid+'&_id='+_id);
     }
-    
+
 }
 exports.upPic = function *() {
         try{
