@@ -251,7 +251,7 @@ exports.getshareVirus = function *(carryid,vid,userid) {
     var userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
     var patients = yield mongodb.collection('infected').find({'vid':vid}).toArray();
     var favor = yield mongodb.collection('action').find({'vid':vid,'action':'spread'}).toArray();
-    var carry = yield mongodb.collection('user').findOne({'_id':ObjectID.createFromHexString(carryid)}).toArray();
+    var carry = yield mongodb.collection('user').findOne({'_id':ObjectID.createFromHexString(carryid)})
     console.log(carry);
     mongodb.collection('shareinfected').insertOne({'carryid':carry.openid,'vid':vid,'infectid':userid,'createtime':Date.parse(new Date())});
     var data = {};
