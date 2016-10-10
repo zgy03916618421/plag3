@@ -174,7 +174,7 @@ exports.getVirusV2 = function *(userid) {
         data.virus = virus;
         data.userinfo = userinfo;
         data.patientNumber = patients[0].count;
-        data.favorCount = favorCount;
+        data.favorCount = favor.length;
         return {'head':{code:200,msg:'success'},'data':data};
     }
 }
