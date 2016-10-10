@@ -131,4 +131,5 @@ exports.shareVirus = function *() {
     var carryid = this.params.carryid;
     var userid = this.params.userid;
     var data = yield infectservice.getshareVirus(carryid,vid,userid);
+    this.body = data;
 }

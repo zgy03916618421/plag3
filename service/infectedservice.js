@@ -3,6 +3,7 @@
  */
 var md5 = require('MD5')
 var underscore = require('underscore')
+var ObjectID = require('mongodb').ObjectID
 exports.getVirus = function *(userid) {
     var total = yield mongodb.collection('order').find().toArray();
     var orders = underscore.filter(total,function (data) {
@@ -257,8 +258,9 @@ exports.getshareVirus = function *(carryid,vid,userid) {
         {$match:{"vid":vid,'action':'spread'}},
         {$group:{'_id':null,'count':{$sum:1}}}
     ]).toArray();
-    var carry = yield mongodb.collection('user').findOne({'_id':carryid});
-     mongodb.collection('shareinfected').insertOne({'carryid':carry.openid,'vid':vid,'infectid':userid,'createtime':Date.parse(new Date())});
+    var carry = yield mongodb.collection('user').findOne({'_id':ObjectID.createFromHexString(carryid)});
+    console.log(carry);
+    mongodb.collection('shareinfected').insertOne({'carryid':carry.openid,'vid':vid,'infectid':userid,'createtime':Date.parse(new Date())});
     var data = {};
     data.virus = virus;
     data.userinfo = userinfo;
