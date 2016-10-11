@@ -68,6 +68,9 @@ exports.createVirus = function *() {
     var carryid = bodyparse.userid;
     var orderid = md5(new Date().valueOf()+Math.random());
     mongodb.collection('user').updateOne({'openid':virus.userid},{$inc:{'viruscount':1}});
+    var data = {};
+    data.virus = virus;
+    data.userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
 /*    mongodb.collection('order').insertOne({
         "orderid":orderid,
         "userid" : carryid,
@@ -83,7 +86,7 @@ exports.createVirus = function *() {
         "orderid":orderid,
         'createtime':Date.parse(new Date())
     });*/
-    this.body = {'head':{code: 300,msg:'success'},'data':virus};
+    this.body = {'head':{code: 300,msg:'success'},'data':data};
 }
 exports.fightVirus = function *() {
     var userid = this.params.userid;
