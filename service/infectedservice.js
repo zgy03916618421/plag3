@@ -199,19 +199,6 @@ exports.speedV4 = function *(vid,userid) {
 
     }
 }
-exports.path = function *(vid,userid) {
-    var path= [];
-    path.push(userid);
-    while (1){
-        var parentInfect = yield mongodb.collection('infected').findOne({'infectid':userid,'vid':vid});
-        if(parentInfect.carryid == parentInfect.infectid){
-            break;
-        }
-        path.push(parentInfect.carryid);
-        userid = parentInfect.carryid;
-    }
-    return path
-}
 exports.tree = function *(vid) {
     var data = yield mongodb.collection('infected').aggregate([
         {$match:{'vid':vid}},
@@ -252,7 +239,6 @@ exports.getshareVirus = function *(carryid,vid,userid) {
     var patients = yield mongodb.collection('infected').find({'vid':vid}).toArray();
     var favor = yield mongodb.collection('action').find({'vid':vid,'action':'spread'}).toArray();
     var carry = yield mongodb.collection('user').findOne({'_id':ObjectID.createFromHexString(carryid)})
-    console.log(carry);
     mongodb.collection('shareinfected').insertOne({'carryid':carry.openid,'vid':vid,'infectid':userid,'createtime':Date.parse(new Date())});
     var data = {};
     data.virus = virus;
