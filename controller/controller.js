@@ -71,7 +71,7 @@ exports.createVirus = function *() {
     var data = {};
     data.virus = virus;
     data.userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
-/*    mongodb.collection('order').insertOne({
+   mongodb.collection('order').insertOne({
         "orderid":orderid,
         "userid" : carryid,
         "vid" : virus.vid,
@@ -85,7 +85,7 @@ exports.createVirus = function *() {
         "infectid":carryid,
         "orderid":orderid,
         'createtime':Date.parse(new Date())
-    });*/
+    });
     this.body = {'head':{code: 300,msg:'success'},'data':data};
 }
 exports.fightVirus = function *() {
@@ -143,4 +143,7 @@ exports.shareVirus = function *() {
     var userid = this.params.userid;
     var data = yield infectservice.getshareVirus(carryid,vid,userid);
     this.body = data;
+}
+exports.graph = function *() {
+
 }
