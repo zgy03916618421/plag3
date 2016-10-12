@@ -144,3 +144,8 @@ exports.shareVirus = function *() {
     var data = yield infectservice.getshareVirus(carryid,vid,userid);
     this.body = data;
 }
+exports.graph = function *() {
+    var vid = this.params.vid;
+    var data = yield infectservice.graph(vid);
+    this.body = data;
+}

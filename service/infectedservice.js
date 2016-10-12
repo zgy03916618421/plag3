@@ -247,3 +247,21 @@ exports.getshareVirus = function *(carryid,vid,userid) {
     data.favorCount = favor.length;
     return {'head':{code:200,msg:'success'},'data':data};
 }
+exports.graph = function *(vid) {
+    var edges = yield mongodb.collection('shareinfected').aggregate([
+        {$match:{'vid':vid}}
+    ]).toArray();
+    var data =[];
+    for (var i =0; i<edges.length;i++){
+        var edge = {};
+        var carryid = edges[i].carryid;
+        var infectid = edges[i].infectid;
+        var carry = yield mongodb.collection('user').findOne({'openid':carryid});
+        var infect = yield mongodb.collection('user').findOne({'openid':infectid});
+        edge.source=carry.nickname;
+        edge.target= infect.nickname;
+        edge.label = vid;
+        data.push(edge);
+    }
+    return data;
+}

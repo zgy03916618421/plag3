@@ -17,4 +17,5 @@ router.get('/getuser/:userid',C.getUserInfo)
 router.get('/path/:userid/:vid',C.path);
 router.get('/tree/:vid',C.tree);
 router.get('/getshare/:carryid/:vid/:userid',C.shareVirus);
+router.get('/graph/:vid',C.graph)
 module.exports = router
