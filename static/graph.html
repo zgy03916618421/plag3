@@ -32,7 +32,7 @@
     function xx() {
         var vid = $("#vid").val();
         $.getJSON(
-                "http://localhost:10000/graph/" + vid,
+                "http://192.168.3.2:10001/graph/" + vid,
                 {format : 'json'},
                 function (res) {
                     var links = res;
