@@ -32,9 +32,9 @@
     function xx() {
         var vid = $("#vid").val();
         $.getJSON(
-                "http://192.168.3.2:10001/graph/" + vid,
+                "http://localhost:10000/graph/" + vid,
                 {format : 'json'},
-                function (res) {
+                function (res) {32
                     var links = res;
                     var nodes = {};
                     links.forEach(function(link) {
