@@ -7,6 +7,7 @@ var qiniuUtil = require('../service/qiniuUtil');
 var md5 = require('MD5')
 var util = require('../service/utilservice');
 var infectservice = require('../service/infectedservice');
+var redisTemplate = require('../db/redisTemplate');
 exports.oauth = function *() {
     var code = this.query.code;
     var redircetUrl = this.query.state;
@@ -22,7 +23,7 @@ exports.oauth = function *() {
     var user = yield mongodb.collection('user').find({'openid':userinfo.openid}).toArray();
     if (!user.length){
         userinfo.createtime = Date.parse(new Date());
-        userinfo.balance = 200;
+        userinfo.balance = yield redisTemplate.get("balance");
         userinfo.income = 0;
         userinfo.viruscount = 0;
         mongodb.collection('user').insertOne(userinfo);
@@ -66,26 +67,25 @@ exports.createVirus = function *() {
     virus.createtime = Date.parse(new Date());
     mongodb.collection('virus').insertOne(virus);
     var carryid = bodyparse.userid;
-    var orderid = md5(new Date().valueOf()+Math.random());
+   // var orderid = md5(new Date().valueOf()+Math.random());
     mongodb.collection('user').updateOne({'openid':virus.userid},{$inc:{'viruscount':1}});
     var data = {};
     data.virus = virus;
     data.userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
-/*    mongodb.collection('order').insertOne({
+  /* mongodb.collection('order').insertOne({
         "orderid":orderid,
         "userid" : carryid,
         "vid" : virus.vid,
         "createtime": Date.parse(new Date()),
         "fullfill" : 0,
         "speed" :false
-    })
+    })*/
     mongodb.collection('infected').insertOne({
         "carryid":carryid,
         "vid":virus.vid,
         "infectid":carryid,
-        "orderid":orderid,
         'createtime':Date.parse(new Date())
-    });*/
+    });
     this.body = {'head':{code: 300,msg:'success'},'data':data};
 }
 exports.fightVirus = function *() {
@@ -143,7 +143,4 @@ exports.shareVirus = function *() {
     var userid = this.params.userid;
     var data = yield infectservice.getshareVirus(carryid,vid,userid);
     this.body = data;
-}
-exports.graph = function *() {
-
 }

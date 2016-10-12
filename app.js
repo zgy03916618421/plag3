@@ -8,6 +8,7 @@ var logger = require('koa-logger');
 var serve = require('koa-static');
 require('./middleware/connectMongo');
 require('./middleware/wechatInit');
+require('./middleware/connectRedis')
 var router = require('./router/router');
 var app = koa();
 app.use(logger());
