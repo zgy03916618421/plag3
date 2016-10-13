@@ -9,7 +9,7 @@ var util = require('../service/utilservice');
 var infectservice = require('../service/infectedservice');
 var redisTemplate = require('../db/redisTemplate');
 exports.login = function *() {
-    var userInfo = this.requst.body;
+    var userInfo = this.request.body;
     var userid = userInfo.openid;
     var has = yield mongodb.collection('user').findOne({'userid':userid});
     if(!has){
