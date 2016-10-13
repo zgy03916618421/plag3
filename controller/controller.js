@@ -8,6 +8,21 @@ var md5 = require('MD5')
 var util = require('../service/utilservice');
 var infectservice = require('../service/infectedservice');
 var redisTemplate = require('../db/redisTemplate');
+exports.login = function *() {
+    var userInfo = this.requst.body;
+    var userid = userInfo.openid;
+    var has = yield mongodb.collection('user').findOne({'userid':userid});
+    if(!has){
+        userInfo.createtime = new Date();
+        userInfo.balance = yield redisTemplate.get("balance");
+        userInfo.income = 0;
+        userInfo.viruscount = 0;
+        mongodb.collection('user').insertOne(userInfo);
+        this.body = {'head':{code: 200,msg:'new user create success'}};
+    }else{
+        this.body = {'head':{code: 300,msg:'user has exist'}};
+    }
+}
 exports.oauth = function *() {
     var code = this.query.code;
     var redircetUrl = this.query.state;
@@ -23,7 +38,7 @@ exports.oauth = function *() {
     var user = yield mongodb.collection('user').find({'openid':userinfo.openid}).toArray();
     if (!user.length){
         userinfo.createtime = Date.parse(new Date());
-        userinfo.balance = yield redisTemplate.get("balance");
+        userinfo.balance =  parseInt(yield redisTemplate.get("balance"));
         userinfo.income = 0;
         userinfo.viruscount = 0;
         mongodb.collection('user').insertOne(userinfo);
