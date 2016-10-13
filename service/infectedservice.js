@@ -265,3 +265,8 @@ exports.graph = function *(vid) {
     }
     return data;
 }
+exports.hotvirus = function *() {
+    var vids = yield mongodb.collection('action').aggregate([
+        
+    ])
+}
