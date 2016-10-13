@@ -267,6 +267,10 @@ exports.graph = function *(vid) {
 }
 exports.hotvirus = function *() {
     var vids = yield mongodb.collection('action').aggregate([
-        
-    ])
+        {$match:{action:"spread"}},
+        {$group:{_id:{vid:"$vid"},count:{$sum:1}}},
+        {$sort:{count:-1}},
+        {$limt:5}
+    ]).toArray()
+
 }
