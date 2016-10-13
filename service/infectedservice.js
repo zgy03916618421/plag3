@@ -272,5 +272,4 @@ exports.hotvirus = function *() {
         {$sort:{count:-1}},
         {$limt:5}
     ]).toArray()
-    console.
 }
