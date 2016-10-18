@@ -3,7 +3,7 @@
  */
 var config = require('../config/config');
 var redis = require('redis'),
-    client = redis.createClient(config.redis.port, config.redis.host,{});
+    client = redis.createClient(6379, '192.168.100.2',{});
 client.on('connect',function () {
     global.redis = client;
     console.log('connect redis  success!');

@@ -13,10 +13,13 @@ router.get('/suriv/virus/:userid',C.fightVirus);
 router.put('/suriv/favor',C.favor);
 router.put('/suriv/disfavor',C.disfavor);
 router.post('/suriv/speed',C.speed);
+router.get('/suriv/share/:userid',C.share);
 router.post('/suriv/recharge',C.recharge);
 router.get('/suriv/getuser/:userid',C.getUserInfo)
 router.get('/suriv/path/:userid/:vid',C.path);
 router.get('/suriv/tree/:vid',C.tree);
 router.get('/suriv/getshare/:carryid/:vid/:userid',C.shareVirus);
-router.get('/suriv/graph/:vid',C.graph)
+router.get('/suriv/graph/:vid',C.graph);
+router.get('/suriv/hotvirus',C.hotvirus);
+router.get('/suriv/virusdetail/:vid')
 module.exports = router

@@ -4,6 +4,7 @@
 var md5 = require('MD5')
 var underscore = require('underscore')
 var ObjectID = require('mongodb').ObjectID
+var redisTemplate = require('../db/redisTemplate');
 exports.getVirus = function *(userid) {
     var total = yield mongodb.collection('order').find().toArray();
     var orders = underscore.filter(total,function (data) {
@@ -63,6 +64,7 @@ exports.favor = function *(userid,vid,speed) {
     doc.fullfill = 0 ;
     doc.speed = speed;
     doc.createtime = Date.parse(new Date());
+    doc.rnd = Math.random();
     yield mongodb.collection('order').insertOne(doc);
     yield mongodb.collection('action').insertOne({'userid':userid,'vid':vid,'action':'spread','createtime':Date.parse(new Date())});
 }
@@ -75,78 +77,16 @@ exports.recharge = function *(money,userid) {
     yield mongodb.collection('deallog').insertOne({'userid':userid,'price':money,'createtime':Date.parse(new Date())});
     return user[0].balance;
 }
-exports.speedv2 = function *(vid,userid) {
-    var user = yield mongodb.collection('user').find({'openid':userid}).toArray();
-    if(user[0].balance < 100){
-        return {'head':{code:600,msg:'no balance'},'data':{balance:user[0].balance}};
-    }else{
-        yield mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':-100}});
-        var path = [];
-        while (1){
-            var parentInfect = yield mongodb.collection('infected').find({'infectid':userid,'vid':vid}).toArray();
-            console.log(parentInfect);
-            var parentOrder = yield mongodb.collection('order').find({'userid':parentInfect[0].carryid,'vid':vid}).toArray();
-            console.log(parentOrder);
-            if(parentInfect[0].carryid == parentInfect[0].infectid){
-                path.push(parentOrder[0].userid);
-                break;
-            }
-            if(parentOrder[0].speed == true){
-                path.push(parentOrder[0].userid);
-            }
-            userid = parentInfect[0].carryid;
-        }
-        console.log(path);
-        if(path.length ==1){
-            yield mongodb.collection('user').updateOne({'openid':path[0]},{$inc:{'income':100,'balance':100}});
-        }else{
-            yield mongodb.collection('user').updateOne({'openid':path[path.length-1]},{$inc:{'income':50,'balance':50}});
-            for (var i =0;i<path.length-1;i++){
-                yield mongodb.collection('user').updateOne({'openid':path[i]},{$inc:{'income':parseInt(50/(path.length-1)),'balance':parseInt(50/(path.length-1))}});
-            }
-        }
-        return {'head':{code: 200,msg:'success'},'data':{balance:user[0].balance-100}};
-    }
-}
-exports.speedV3 = function *(vid,userid) {
-    var user = yield mongodb.collection('user').find({'openid':userid}).toArray();
-    if(user[0].balance < 100){
-        return {'head':{code:600,msg:'no balance'},'data':{balance:user[0].balance}};
-    }else{
-        mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':-100}});
-        var time = Date.parse(new Date());
-        console.log(time);
-        var carriers = yield mongodb.collection('infected').find({'vid':vid,'createtime':{$lt:time}}).toArray();
-        console.log(carriers);
-        var users = [];
-        for (var cid=0;cid<carriers.length;cid ++){
-             var order = yield mongodb.collection('order').find({'vid':vid,'userid':carriers[cid].infectid}).toArray();
-            console.log(order);
-            if(order.length&&order[0].speed){
-                    users.push(order[0].userid);
-            }
-        }
-
-        console.log(users);
-        var source = yield mongodb.collection('virus').find({'vid':vid}).toArray();
-        var sourceid = source[0].userid;
-        console.log(sourceid)
-        if (!users.length){
-            yield mongodb.collection('user').updateOne({'openid':sourceid},{$inc:{'income':100,'balance':100}});
-        }else{
-            yield mongodb.collection('user').updateOne({'openid':sourceid},{$inc:{'income':50,'balance':50}});
-            for (var n =0;n<users.length;n++){
-                yield mongodb.collection('user').updateOne({'openid':users[n]},{$inc:{'income':parseInt(50/(users.length)),'balance':parseInt(50/(users.length))}});
-            }
-        }
-        return {'head':{code: 200,msg:'success'},'data':{balance:user[0].balance-100}};
-    }
+exports.share = function *(userid) {
+    var shareCount = parseInt(yield redisTemplate.get('share'));
+    console.log(shareCount);
+    yield mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':shareCount}});
 }
 exports.actionLog = function *(vid) {
 
 }
 exports.getVirusV2 = function *(userid) {
-    var infects = yield mongodb.collection('infected').find({$or: [{infectid: userid}, {carryid: userid}]}, {vid: 1}).toArray();
+    var infects = yield mongodb.collection('infected').find({$or: [{infectid: userid}, {carryid: userid}]},{vid:1}).toArray();
     var ifs = infects.map(function (doc) {
         return doc.vid;
     })
@@ -155,14 +95,19 @@ exports.getVirusV2 = function *(userid) {
             {$and: [{speed: false}, {fullfill: {$lt: 4}}]}
         ]}]}
     );
+
     if (!order){
         var data = {'head':{code: 1000,msg:'no virus'}};
         return data
     }else{
        yield mongodb.collection('order').updateOne({'orderid':order.orderid},{$inc:{'fullfill':1}});
+        console.log('1');
        yield mongodb.collection('infected').insertOne({'carryid':order.userid,'vid':order.vid,'infectid':userid,'orderid':order.orderid,'createtime':Date.parse(new Date())});
+        console.log('2');
         var virus = yield mongodb.collection('virus').findOne({'vid':order.vid});
+        console.log('3');
         var userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
+        console.log('4');
         //var patients = yield mongodb.collection('infected').find({'vid':order.vid}).toArray();
         var patients = yield mongodb.collection('infected').aggregate([
             {$match:{"vid":order.vid}},
@@ -230,9 +175,6 @@ exports.tree = function *(vid) {
     return treeData;
     
 }
-exports.share = function *(userid,vid) {
-
-}
 exports.getshareVirus = function *(carryid,vid,userid) {
     var virus = yield mongodb.collection('virus').findOne({'vid':vid});
     var userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
@@ -270,6 +212,11 @@ exports.hotvirus = function *() {
         {$match:{action:"spread"}},
         {$group:{_id:{vid:"$vid"},count:{$sum:1}}},
         {$sort:{count:-1}},
-        {$limt:5}
-    ]).toArray()
+        {$limit:5}
+    ]).toArray();
+    return vids;
+}
+exports.getVirusById = function *(vid) {
+    var virus = yield mongodb.collection('virus').findOne({'vid':vid});
+    return virus;
 }

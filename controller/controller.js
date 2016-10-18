@@ -11,7 +11,7 @@ var redisTemplate = require('../db/redisTemplate');
 exports.login = function *() {
     var userInfo = this.request.body;
     var userid = userInfo.openid;
-    var has = yield mongodb.collection('user').findOne({'userid':userid});
+    var has = yield mongodb.collection('user').findOne({'openid':userid});
     if(!has){
         userInfo.createtime = new Date();
         userInfo.balance = yield redisTemplate.get("balance");
@@ -127,6 +127,12 @@ exports.speed = function *() {
     var data = yield infectservice.speedV4(vid,userid);
     this.body = data;
 }
+exports.share = function*(){
+    var userid = this.params.userid;
+    console.log(userid);
+    yield infectservice.share(userid);
+    this.body = {'head':{code: 300,msg:'success'}};
+}
 exports.recharge = function *() {
     var money = this.request.body.money;
     var userid = this.request.body.userid;
@@ -163,4 +169,8 @@ exports.graph = function *() {
     var vid = this.params.vid;
     var data = yield infectservice.graph(vid);
     this.body = data;
+}
+exports.hotvirus = function *() {
+    var data = yield infectservice.hotvirus();
+    this.body=data;
 }
