@@ -96,6 +96,7 @@ exports.createVirus = function *() {
 }
 exports.fightVirus = function *() {
     var userid = this.params.userid;
+    console.log(userid);
     var data = yield infectservice.getVirusV2(userid);
     this.body = data;
 }
