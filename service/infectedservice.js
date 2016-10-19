@@ -141,7 +141,7 @@ exports.speedV4 = function *(vid,userid) {
         }else{
             yield mongodb.collection('user').updateOne({'openid':source.userid},{$inc:{'income':100,'balance':100}});
         }
-
+        return {'head':{code: 200,msg:'success'},'data':{balance:user.balance-100}}
     }
 }
 exports.tree = function *(vid) {
