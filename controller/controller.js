@@ -101,6 +101,7 @@ exports.fightVirus = function *() {
     this.body = data;
 }
 exports.favor = function *() {
+    console.log(this.request.body);
     var userid = this.request.body.userid;
     var vid = this.request.body.vid;
     var speed = this.request.body.speed;
