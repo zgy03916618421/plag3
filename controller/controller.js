@@ -133,9 +133,20 @@ exports.recharge = function *() {
     this.body = {'head':{code: 200,msg:'success'},'data':{balance:data}};
 }
 exports.getUserInfo = function *() {
+    var data = {}
     var userid = this.params.userid;
-    var userinfo = yield  mongodb.collection('user').find({'openid':userid}).toArray();
-    this.body = {'head':{code:200,msg:'success'},'data':userinfo[0]}
+    var userinfo = yield  mongodb.collection('user').findOne({'openid':userid});
+    var speedCount = yield mongodb.collection('order').aggregate([
+        {$match:{"userid":userid,"speed":true}},
+        {$group:{"_id":null,"count":{$sum:1}}}
+    ]).toArray();
+    if(!speedCount.length){
+        data.speedCount = 0;
+    }else{
+        data.speedCount = speedCount[0].count;
+    }
+    data.userinfo = userinfo
+    this.body = {'head':{code:200,msg:'success'},'data':data};
 }
 exports.path = function *() {
     var vid = this.params.vid;
