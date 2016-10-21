@@ -178,3 +178,17 @@ exports.hotvirus = function *() {
     var data = yield infectservice.hotvirus();
     this.body=data;
 }
+exports.myViruslist = function *() {
+    var userid = this.query.userid;
+    var skip = parseInt(this.query.skip);
+    var limit = parseInt(this.query.limit);
+    var data = yield infectservice.myViruslist(userid,skip,limit);
+    this.body = {'head':{code:200,msg:'success'},'data':data};
+}
+exports.mySpeedlist = function *() {
+    var userid = this.query.userid;
+    var skip = parseInt(this.query.skip);
+    var limit = parseInt(this.query.limit);
+    var data = yield infectservice.mySpeedlist(userid,skip,limit);
+    this.body = {'head':{code:200,msg:'success'},'data':data};
+}

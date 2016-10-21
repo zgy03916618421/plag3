@@ -227,3 +227,25 @@ exports.getVirusById = function *(vid) {
     var virus = yield mongodb.collection('virus').findOne({'vid':vid});
     return virus;
 }
+exports.myViruslist = function *(userid,skip,limit) {
+    var virusList = yield mongodb.collection('virus').aggregate([
+        {$match:{"userid":userid}},
+        {$skip:skip},
+        {$limit:limit}
+    ]).toArray();
+    return virusList;
+}
+exports.mySpeedlist = function *(userid,skip,limit) {
+    var speedList = yield mongodb.collection('order').aggregate([
+        {$match:{"userid":userid,"speed":true}},
+        {$skip:skip},
+        {$limit:limit},
+        {$project:{"vid":1,"_id":0}}
+    ]).toArray();
+    var list = speedList.map(function (doc) {
+        return doc.vid;
+    })
+    var speedVirus = yield mongodb.collection('virus').find({'vid':{$in:list}}).toArray();
+    console.log(speedVirus)
+    return speedVirus;
+}

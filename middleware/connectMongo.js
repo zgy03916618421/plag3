@@ -9,7 +9,7 @@ if(process.env.BS_ENV == 'dev'){
     var _auth = config.mongo.user+':'+config.mongo.pass+'@';
 }
 var host = config.mongo.host + ':27017';
-MongoClient.connect('mongodb://192.168.100.2:27017/plag',function (err,db) {
+MongoClient.connect('mongodb://plag_reader:ajrsRKf5@192.168.200.22:27017/plag',function (err,db) {
     if (err) {
         console.error("connect to mongo error");
         process.exit(1);
