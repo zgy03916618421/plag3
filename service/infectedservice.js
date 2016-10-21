@@ -233,6 +233,27 @@ exports.myViruslist = function *(userid,skip,limit) {
         {$skip:skip},
         {$limit:limit}
     ]).toArray();
+    for (var i =0;i<virusList.length;i++){
+        var vid = virusList[i].vid;
+        var scan =  yield mongodb.collection('infected').aggregate([
+            {$match:{"vid":vid}},
+            {$group:{"_id":null,"count":{$sum:1}}}
+        ]).toArray();
+        if(scan.length){
+            virusList[i].scanCount = scan[0].count;
+        }else{
+            virusList[i].scanCount = 0;
+        }
+        var spread = yield mongodb.collection('action').aggregate([
+            {$match:{'vid':vid,"action":"spread"}},
+            {$group:{'_id':null,"count":{$sum:1}}}
+        ]).toArray();
+        if(spread.length){
+            virusList[i].spreadCount = spread[0].count;
+        }else{
+            virusList[i].spreadCount = 0;
+        }
+    }
     return virusList;
 }
 exports.mySpeedlist = function *(userid,skip,limit) {
@@ -246,6 +267,27 @@ exports.mySpeedlist = function *(userid,skip,limit) {
         return doc.vid;
     })
     var speedVirus = yield mongodb.collection('virus').find({'vid':{$in:list}}).toArray();
-    console.log(speedVirus)
+    for (var i =0;i<speedVirus.length;i++){
+        var vid = speedVirus[i].vid;
+        var scan =  yield mongodb.collection('infected').aggregate([
+            {$match:{"vid":vid}},
+            {$group:{"_id":null,"count":{$sum:1}}}
+        ]).toArray();
+        if(scan.length){
+            speedVirus[i].scanCount = scan[0].count;
+        }else{
+            speedVirus[i].scanCount = 0;
+        }
+        var spread = yield mongodb.collection('action').aggregate([
+            {$match:{'vid':vid,"action":"spread"}},
+            {$group:{'_id':null,"count":{$sum:1}}}
+        ]).toArray();
+        if(spread.length){
+            speedVirus[i].spreadCount = spread[0].count;
+        }else{
+            speedVirus[i].spreadCount = 0;
+        }
+        speedVirus[i].userinfo = yield mongodb.collection('user').findOne({'openid':speedVirus[i].userid});
+    }
     return speedVirus;
 }
