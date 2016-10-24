@@ -14,7 +14,7 @@ exports.login = function *() {
     var has = yield mongodb.collection('user').findOne({'openid':userid});
     if(!has){
         userInfo.createtime = new Date();
-        userInfo.balance = yield redisTemplate.get("balance");
+        userInfo.balance = parseInt(yield redisTemplate.get("balance"));
         userInfo.income = 0;
         userInfo.viruscount = 0;
         mongodb.collection('user').insertOne(userInfo);
@@ -191,4 +191,11 @@ exports.mySpeedlist = function *() {
     var limit = parseInt(this.query.limit);
     var data = yield infectservice.mySpeedlist(userid,skip,limit);
     this.body = {'head':{code:200,msg:'success'},'data':data};
+}
+exports.speedComment = function *() {
+    var userid = this.request.userid;
+    var vid = this.request.vid;
+    var comment = this.request.comment;
+    yield infectservice.speedComment(userid,vid,comment);
+    this.body = {'head':{code:200,msg:'success'}};
 }

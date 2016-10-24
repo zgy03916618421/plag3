@@ -291,3 +291,6 @@ exports.mySpeedlist = function *(userid,skip,limit) {
     }
     return speedVirus;
 }
+exports.speedComment = function *(userid,vid,commemt) {
+    mongodb.collection('speedcomment').insertOne({'userid':userid,'vid':vid,'comment':commemt});
+}
