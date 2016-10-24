@@ -24,5 +24,5 @@ router.get('/hotvirus',C.hotvirus);
 /*router.get('/virusdetail/:vid',C.v);*/
 router.get('/myviruslist',C.myViruslist);
 router.get('/myspeedlist',C.mySpeedlist);
-router.post('/speedcomment'，C.speedComment);
+router.post('/speedcomment',C.speedComment);
 module.exports = router
