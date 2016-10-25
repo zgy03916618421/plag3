@@ -1,6 +1,7 @@
 /**
  * Created by Administrator on 2016/9/21.
  */
+var cryPto = require('crypto');
 var md5 = require('MD5')
 var underscore = require('underscore')
 var ObjectID = require('mongodb').ObjectID

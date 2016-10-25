@@ -1,8 +1,5 @@
 /**
  * Created by Administrator on 2016/9/27.
  */
-var data = [{'name':'zhougy'},{'name':'zhaixiaoai'}];
-for(var i=0;i<data.length;i++){
-    data[i].age = 18;
-}
+var data = new Date(1476248427000.0);
 console.log(data);

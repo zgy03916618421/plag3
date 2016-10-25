@@ -8,6 +8,7 @@ var md5 = require('MD5')
 var util = require('../service/utilservice');
 var infectservice = require('../service/infectedservice');
 var redisTemplate = require('../db/redisTemplate');
+
 exports.login = function *() {
     var userInfo = this.request.body;
     var userid = userInfo.openid;
@@ -18,9 +19,9 @@ exports.login = function *() {
         userInfo.income = 0;
         userInfo.viruscount = 0;
         mongodb.collection('user').insertOne(userInfo);
-        this.body = {'head':{code: 200,msg:'new user create success'}};
+        this.body = {'head':{code: 200,msg:'new user create success'},'data':userInfo};
     }else{
-        this.body = {'head':{code: 300,msg:'user has exist'}};
+        this.body = {'head':{code: 300,msg:'user has exist'},'data':has};
     }
 }
 exports.oauth = function *() {
