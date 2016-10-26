@@ -13,6 +13,7 @@ MongoClient.connect('mongodb://plag:xLuYMSgJ@192.168.200.22:27017/plag',function
                 db.collection('order').aggregate([
                     {$match:{vid:doc._id,speed:true}}
                 ]).toArray(function (err,item) {
+                    console.log(item)
                     if(item.length){
                         doc.speedcount = item.length;
                     }else{
@@ -21,6 +22,7 @@ MongoClient.connect('mongodb://plag:xLuYMSgJ@192.168.200.22:27017/plag',function
                     db.collection('action').aggregate([
                         {$match:{vid:doc._id,action:'spread'}}
                     ]).toArray(function (err,item2) {
+                        console.log(item2)
                         if(item2.length){
                             doc.spreadcount = item2.length;
                         }else{

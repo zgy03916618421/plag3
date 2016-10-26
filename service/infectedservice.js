@@ -245,14 +245,14 @@ exports.myViruslist = function *(userid,skip,limit) {
         }else{
             virusList[i].scanCount = 0;
         }
-        var spread = yield mongodb.collection('action').aggregate([
-            {$match:{'vid':vid,"action":"spread"}},
+        var speed = yield mongodb.collection('order').aggregate([
+            {$match:{'vid':vid,"apeed":true}},
             {$group:{'_id':null,"count":{$sum:1}}}
         ]).toArray();
-        if(spread.length){
-            virusList[i].spreadCount = spread[0].count;
+        if(speed.length){
+            virusList[i].speedCount = spread[0].count;
         }else{
-            virusList[i].spreadCount = 0;
+            virusList[i].speedCount = 0;
         }
     }
     return virusList;
@@ -279,14 +279,14 @@ exports.mySpeedlist = function *(userid,skip,limit) {
         }else{
             speedVirus[i].scanCount = 0;
         }
-        var spread = yield mongodb.collection('action').aggregate([
-            {$match:{'vid':vid,"action":"spread"}},
+        var speed = yield mongodb.collection('order').aggregate([
+            {$match:{'vid':vid,"speed":true}},
             {$group:{'_id':null,"count":{$sum:1}}}
         ]).toArray();
-        if(spread.length){
-            speedVirus[i].spreadCount = spread[0].count;
+        if(speed.length){
+            speedVirus[i].speedCount = spread[0].count;
         }else{
-            speedVirus[i].spreadCount = 0;
+            speedVirus[i].speedCount = 0;
         }
         speedVirus[i].userinfo = yield mongodb.collection('user').findOne({'openid':speedVirus[i].userid});
     }

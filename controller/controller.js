@@ -128,7 +128,7 @@ exports.share = function*(){
     this.body = {'head':{code: 300,msg:'success'}};
 }
 exports.recharge = function *() {
-    var money = this.request.body.money;
+    var money = parseInt(this.request.body.money);
     var userid = this.request.body.userid;
     var data = yield infectservice.recharge(money,userid);
     this.body = {'head':{code: 200,msg:'success'},'data':{balance:data}};
