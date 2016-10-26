@@ -250,7 +250,7 @@ exports.myViruslist = function *(userid,skip,limit) {
             {$group:{'_id':null,"count":{$sum:1}}}
         ]).toArray();
         if(speed.length){
-            virusList[i].speedCount = spread[0].count;
+            virusList[i].speedCount = speed[0].count;
         }else{
             virusList[i].speedCount = 0;
         }
@@ -284,7 +284,7 @@ exports.mySpeedlist = function *(userid,skip,limit) {
             {$group:{'_id':null,"count":{$sum:1}}}
         ]).toArray();
         if(speed.length){
-            speedVirus[i].speedCount = spread[0].count;
+            speedVirus[i].speedCount = speed[0].count;
         }else{
             speedVirus[i].speedCount = 0;
         }
