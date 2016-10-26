@@ -9,7 +9,8 @@ var util = require('../service/utilservice');
 var infectservice = require('../service/infectedservice');
 var redisTemplate = require('../db/redisTemplate');
 exports.androidConfig = function *() {
-    this.body = JSON.parse(yield redisTemplate.get('androidconfig'))
+    var data = JSON.parse(yield redisTemplate.get('androidconfig'));
+    this.body = {'head':{code: 200,msg:'new user create success'},'data':data};
 }
 exports.login = function *() {
     var userInfo = this.request.body;
