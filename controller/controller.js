@@ -138,7 +138,7 @@ exports.recharge = function *() {
 exports.getUserInfo = function *() {
     var data = {}
     var userid = this.params.userid;
-    var userinfo = yield  mongodb.collection('user').findOne({'openid':userid});
+    var userinfo = yield  mongodb.collection('user').findOne({'user_id':userid});
     var speedCount = yield mongodb.collection('order').aggregate([
         {$match:{"userid":userid,"speed":true}},
         {$group:{"_id":null,"count":{$sum:1}}}
