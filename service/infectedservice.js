@@ -285,7 +285,7 @@ exports.mySpeedlist = function *(userid,skip,limit) {
         }else{
             speedVirus[i].speedCount = 0;
         }
-        speedVirus[i].userinfo = yield mongodb.collection('user').findOne({'openid':speedVirus[i].userid});
+        speedVirus[i].userinfo = yield mongodb.collection('user').findOne({'user_id':speedVirus[i].userid});
     }
     return speedVirus;
 }
