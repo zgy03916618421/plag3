@@ -85,7 +85,7 @@ exports.createVirus = function *() {
     virus.createtime = Date.parse(new Date());
     mongodb.collection('virus').insertOne(virus);
     var carryid = bodyparse.userid;
-    mongodb.collection('user').updateOne({'openid':virus.userid},{$inc:{'viruscount':1}});
+    mongodb.collection('user').updateOne({'user_id':virus.userid},{$inc:{'viruscount':1}});
     var data = {};
     data.virus = virus;
     data.userinfo = yield mongodb.collection('user').findOne({'user_id':virus.userid});
