@@ -8,7 +8,9 @@ var md5 = require('MD5')
 var util = require('../service/utilservice');
 var infectservice = require('../service/infectedservice');
 var redisTemplate = require('../db/redisTemplate');
-
+exports.androidConfig = function *() {
+    this.body = JSON.parse(yield redisTemplate.get('androidconfig'))
+}
 exports.login = function *() {
     var userInfo = this.request.body;
     var userid = userInfo.unionid;
@@ -47,9 +49,9 @@ exports.oauth = function *() {
         mongodb.collection('user').insertOne(userinfo);
     }
     if(redircetUrl.length<6){
-        this.response.redirect(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.openid);
+        this.response.redirect(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.user_id);
     }else{
-        this.response.redirect(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.openid+'&vid='+vid+'&_id='+_id);
+        this.response.redirect(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.user_id+'&vid='+vid+'&_id='+_id);
     }
 
 }
