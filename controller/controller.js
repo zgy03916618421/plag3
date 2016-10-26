@@ -11,9 +11,10 @@ var redisTemplate = require('../db/redisTemplate');
 
 exports.login = function *() {
     var userInfo = this.request.body;
-    var userid = userInfo.openid;
-    var has = yield mongodb.collection('user').findOne({'openid':userid});
+    var userid = userInfo.unionid;
+    var has = yield mongodb.collection('user').findOne({'unionid':userid});
     if(!has){
+        userInfo.user_id = md5(new Date().valueOf());
         userInfo.createtime = new Date();
         userInfo.balance = parseInt(yield redisTemplate.get("balance"));
         userInfo.income = 0;
@@ -36,8 +37,9 @@ exports.oauth = function *() {
     var accessToken = token.data.access_token;
     var openid = token.data.openid;
     var userinfo = yield client.getUser(openid);
-    var user = yield mongodb.collection('user').find({'openid':userinfo.openid}).toArray();
+    var user = yield mongodb.collection('user').find({'unionid':userinfo.unionid}).toArray();
     if (!user.length){
+        userinfo.user_id = md5(new Date().valueOf());
         userinfo.createtime = Date.parse(new Date());
         userinfo.balance =  parseInt(yield redisTemplate.get("balance"));
         userinfo.income = 0;
@@ -86,7 +88,7 @@ exports.createVirus = function *() {
     mongodb.collection('user').updateOne({'openid':virus.userid},{$inc:{'viruscount':1}});
     var data = {};
     data.virus = virus;
-    data.userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
+    data.userinfo = yield mongodb.collection('user').findOne({'user_id':virus.userid});
     mongodb.collection('infected').insertOne({
         "carryid":carryid,
         "vid":virus.vid,
