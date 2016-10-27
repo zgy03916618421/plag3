@@ -121,6 +121,7 @@ exports.getVirusV2 = function *(userid) {
         //var favor = yield mongodb.collection('action').find({'vid':order.vid,'action':'spread'}).toArray();
         var data ={};
         data.virus = virus;
+        data.userinfo = userinfo;
         if(patients.length){
             data.virus.scanCount = patients[0].count;
             data.patientNumber = patients[0].count;
@@ -140,7 +141,7 @@ exports.getVirusV2 = function *(userid) {
         }else{
             data.virus.speedCount = 0
         }
-        data.userinfo = userinfo;
+        
         return {'head':{code:200,msg:'success'},'data':data};
     }
 }
@@ -246,7 +247,41 @@ exports.hotvirus = function *() {
 }
 exports.getVirusById = function *(vid) {
     var virus = yield mongodb.collection('virus').findOne({'vid':vid});
-    return virus;
+    var user = yield mongodb.collection('user').findOne({'user_id':virus.userid});
+    var patients = yield mongodb.collection('infected').aggregate([
+        {$match:{"vid":vid}},
+        {$group:{"_id":null,"count":{$sum:1}}}
+    ]).toArray();
+    var favor = yield mongodb.collection('action').aggregate([
+        {$match:{"vid":vid,"action":"spread"}},
+        {$group:{"_id":null,"count":{$sum:1}}}
+    ]).toArray();
+    var speed = yield mongodb.collection('order').aggregate([
+        {$match:{"vid":vid,"speed":true}},
+        {$group:{"_id":null,"count":{$sum:1}}}
+    ]).toArray();
+    var data ={};
+    data.virus = virus;
+    data.userinfo = user;
+    if(patients.length){
+        data.virus.scanCount = patients[0].count;
+
+    }else{
+        data.virus.scanCount = 0;
+
+    }
+    if(favor.length){
+        data.virus.favorCount = favor[0].count;
+    }else{
+        data.virus.favorCount = 0;
+    }
+    if(speed.length){
+        data.virus.speedCount = speed[0].count;
+    }else{
+        data.virus.speedCount = 0
+    }
+
+    return {'head':{code:200,msg:'success'},'data':data};
 }
 exports.myViruslist = function *(userid,skip,limit) {
     var virusList = yield mongodb.collection('virus').aggregate([
