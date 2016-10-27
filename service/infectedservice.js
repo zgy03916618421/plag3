@@ -93,7 +93,6 @@ exports.getVirusV2 = function *(userid) {
             {$and: [{speed: false}, {fullfill: {$lt: 4}}]}
         ]}]}
     );
-
     if (!order){
         var data = {'head':{code: 1000,msg:'no virus'}};
         return data
@@ -267,7 +266,7 @@ exports.myViruslist = function *(userid,skip,limit) {
             virusList[i].scanCount = 0;
         }
         var speed = yield mongodb.collection('order').aggregate([
-            {$match:{'vid':vid,"apeed":true}},
+            {$match:{'vid':vid,"speed":true}},
             {$group:{'_id':null,"count":{$sum:1}}}
         ]).toArray();
         if(speed.length){
