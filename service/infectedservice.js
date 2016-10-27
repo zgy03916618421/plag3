@@ -122,21 +122,21 @@ exports.getVirusV2 = function *(userid) {
         //var favor = yield mongodb.collection('action').find({'vid':order.vid,'action':'spread'}).toArray();
         var data ={};
         data.virus = virus;
-        if(!patients.length){
+        if(patients.length){
             data.virus.scanCount = patients[0].count;
             data.patientNumber = patients[0].count;
         }else{
             data.virus.scanCount = 0;
             data.patientNumber = 0;
         }
-        if(!favor.length){
+        if(favor.length){
             data.virus.favorCount = favor[0].count;
             data.favorCount = favor[0].count;
         }else{
             data.virus.favorCount = 0;
             data.favorCount = 0;
         }
-        if(!speed.length){
+        if(speed.length){
             data.virus.speedCount = speed[0].count;
         }else{
             data.virus.speedCount = 0
