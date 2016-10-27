@@ -5,6 +5,7 @@ var parse = require('co-busboy');
 var router = require('koa-router')();
 var C = require('../controller/controller');
 var fs = require('fs');
+router.get('/anonylogin',)
 router.get('/androidconfig',C.androidConfig);
 router.post('/login',C.login);
 router.get('/oauth',C.oauth);

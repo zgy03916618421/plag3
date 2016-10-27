@@ -12,6 +12,15 @@ exports.androidConfig = function *() {
     var data = yield redisTemplate.get('androidconfig');
     this.body = {'head':{code: 200,msg:'new user create success'},'data':data};
 }
+exports.anonyLogin = function *() {
+    var userinfo = {};
+    userinfo.user_id = md5(new Date().valueOf()+Math.random());
+    userinfo.openid = userinfo.user_id;
+    userinfo.headimgurl = '';
+    userinfo.nickname = '匿名';
+    mongodb.collection('user').insertOne(userinfo);
+    this.body = {'head':{code: 300,msg:'user has exist'},'data':userinfo};
+}
 exports.login = function *() {
     var userInfo = this.request.body;
     var userid = userInfo.unionid;
