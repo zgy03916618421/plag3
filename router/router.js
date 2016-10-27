@@ -23,7 +23,7 @@ router.get('/tree/:vid',C.tree);
 router.get('/getshare/:carryid/:vid/:userid',C.shareVirus);
 router.get('/graph/:vid',C.graph);
 router.get('/hotvirus',C.hotvirus);
-router.get('/virusdetail/:vid');
+router.get('/virusdetail/:vid',C.getVirusById);
 router.get('/myviruslist',C.myViruslist);
 router.get('/myspeedlist',C.mySpeedlist);
 router.post('/speedcomment',C.speedComment);
