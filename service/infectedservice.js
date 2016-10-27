@@ -99,25 +99,49 @@ exports.getVirusV2 = function *(userid) {
         return data
     }else{
        yield mongodb.collection('order').updateOne({'orderid':order.orderid},{$inc:{'fullfill':1}});
-        console.log('1');
+
        yield mongodb.collection('infected').insertOne({'carryid':order.userid,'vid':order.vid,'infectid':userid,'orderid':order.orderid,'createtime':Date.parse(new Date())});
-        console.log('2');
+
         var virus = yield mongodb.collection('virus').findOne({'vid':order.vid});
-        console.log('3');
+
         var userinfo = yield mongodb.collection('user').findOne({'user_id':virus.userid});
-        console.log('4');
+
         //var patients = yield mongodb.collection('infected').find({'vid':order.vid}).toArray();
         var patients = yield mongodb.collection('infected').aggregate([
             {$match:{"vid":order.vid}},
             {$group:{"_id":null,"count":{$sum:1}}}
         ]).toArray();
-        var favor = yield mongodb.collection('action').find({'vid':order.vid,'action':'spread'}).toArray();
-
+        var favor = yield mongodb.collection('action').aggregate([
+            {$match:{"vid":order.vid,"action":"spread"}},
+            {$group:{"_id":null,"count":{$sum:1}}}
+        ]).toArray();
+        var speed = yield mongodb.collection('order').aggregate([
+            {$match:{"vid":order.vid,"speed":true}},
+            {$group:{"_id":null,"count":{$sum:1}}}
+        ]).toArray();
+        //var favor = yield mongodb.collection('action').find({'vid':order.vid,'action':'spread'}).toArray();
         var data ={};
         data.virus = virus;
+        if(!patients.length){
+            data.virus.scanCount = patients[0].count;
+            data.patientNumber = patients[0].count;
+        }else{
+            data.virus.scanCount = 0;
+            data.patientNumber = 0;
+        }
+        if(!favor.length){
+            data.virus.favorCount = favor[0].count;
+            data.favorCount = favor[0].count;
+        }else{
+            data.virus.favorCount = 0;
+            data.favorCount = 0;
+        }
+        if(!speed.length){
+            data.virus.speedCount = speed[0].count;
+        }else{
+            data.virus.speedCount = 0
+        }
         data.userinfo = userinfo;
-        data.patientNumber = patients[0].count;
-        data.favorCount = favor.length;
         return {'head':{code:200,msg:'success'},'data':data};
     }
 }
