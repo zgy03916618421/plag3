@@ -223,5 +223,5 @@ exports.speedComment = function *() {
 exports.getVirusById = function *() {
     var vid = this.params.vid;
     var data = yield infectservice.getVirusById(vid);
-    this.bdoy = data;
+    this.body = data;
 }
