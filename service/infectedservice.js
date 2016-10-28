@@ -6,6 +6,7 @@ var md5 = require('MD5')
 var underscore = require('underscore')
 var ObjectID = require('mongodb').ObjectID
 var redisTemplate = require('../db/redisTemplate');
+var pingUtil = require('./pingppUtil');
 exports.getVirus = function *(userid) {
     var total = yield mongodb.collection('order').find().toArray();
     var orders = underscore.filter(total,function (data) {
@@ -73,7 +74,7 @@ exports.disfavor = function *(userid,vid) {
     yield mongodb.collection('action').insertOne({'userid':userid,'vid':vid,'action':'skip','createtime':Date.parse(new Date())});
 }
 exports.recharge = function *(money,userid) {
-    yield mongodb.collection('user').updateOne({'user_id':userid},{$inc:{'balance':money*10}});
+    yield mongodb.collection('user').updateOne({'user_id':userid},{$inc:{'balance':money}});
     var user = yield mongodb.collection('user').findOne({'user_id':userid});
     yield mongodb.collection('deallog').insertOne({'userid':userid,'price':money,'createtime':Date.parse(new Date())});
     return user.balance;
@@ -349,4 +350,9 @@ exports.mySpeedlist = function *(userid,skip,limit) {
 }
 exports.speedComment = function *(userid,vid,commemt) {
     mongodb.collection('speedcomment').insertOne({'userid':userid,'vid':vid,'comment':commemt});
+}
+exports.pingPay = function *(amount) {
+    var opt = {
+
+    }
 }
