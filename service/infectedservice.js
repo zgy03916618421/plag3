@@ -351,8 +351,9 @@ exports.mySpeedlist = function *(userid,skip,limit) {
 exports.speedComment = function *(userid,vid,commemt) {
     mongodb.collection('speedcomment').insertOne({'userid':userid,'vid':vid,'comment':commemt});
 }
+/*
 exports.pingPay = function *(amount) {
     var opt = {
 
     }
-}
+}*/
