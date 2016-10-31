@@ -227,12 +227,16 @@ exports.getVirusById = function *() {
 }
 exports.pingPay = function *() {
     var amount = parseInt(this.request.body.amount);
-    var ip = this.request.ip;
-    var result = yield infectservice.pingPay(amount,ip);
+    var userid = this.request.body.userid;
+    var result = yield infectservice.pingPay(amount,userid);
     var data = {};
     data.charge = JSON.stringify(result);
-    this.body = {'head':{code: 300,msg:'success'},'data':data};
+    this.body = {'head':{code: 200,msg:'success'},'data':data};
 }
 exports.webHooks = function *() {
-
+    var bodyParse = this.request.body;
+    var type = bodyParse.type;
+    var order = bodyParse.data;
+    var data = yield infectservice.webHooks(type,order);
+    this.body = data;
 }

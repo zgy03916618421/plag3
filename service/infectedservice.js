@@ -352,10 +352,10 @@ exports.mySpeedlist = function *(userid,skip,limit) {
 exports.speedComment = function *(userid,vid,commemt) {
     mongodb.collection('speedcomment').insertOne({'userid':userid,'vid':vid,'comment':commemt});
 }
-exports.pingPay = function *(amount,ip) {
+exports.pingPay = function *(amount,userid) {
     var opt = {
         subject:"test",
-        body : "plag test",
+        body : userid,
         amount:amount,
         order_no:md5(new Date()),
         channel:"wx",
@@ -365,4 +365,12 @@ exports.pingPay = function *(amount,ip) {
     }
     var result = yield pingUtil.chargeCreate(opt);
     return result;
+}
+exports.webHooks = function *(type,order) {
+    var userid = order.object.body;
+    var amount = order.object.amount;
+    if(type == charge.succeeded){
+        mongodb.collection('user').updateOne({'uesr_id':userid},{$inc:{balance:amount*10}})
+        return {'head':{code: 200,msg:'success'}};
+    }
 }
