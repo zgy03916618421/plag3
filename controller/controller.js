@@ -231,3 +231,6 @@ exports.pingPay = function *() {
     var data = yield infectservice.pingPay(amount,ip);
     this.body = {'head':{code: 300,msg:'success'},'data':data};
 }
+exports.webHooks = function *() {
+    
+}

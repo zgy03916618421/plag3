@@ -358,7 +358,7 @@ exports.pingPay = function *(amount,ip) {
         body : "plag test",
         amount:amount,
         order_no:md5(new Date()),
-        channel:"alipay",
+        channel:"wx",
         currency:"cny",
         client_ip:"127.0.0.1",
         app:{id:pingConfig.appID}

@@ -28,4 +28,5 @@ router.get('/myviruslist',C.myViruslist);
 router.get('/myspeedlist',C.mySpeedlist);
 router.post('/speedcomment',C.speedComment);
 router.post('/pingpay',C.pingPay);
+router.post('/webhooks',C.webHooks);
 module.exports = router
