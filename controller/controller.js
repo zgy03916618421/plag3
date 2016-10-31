@@ -229,6 +229,7 @@ exports.pingPay = function *() {
     var amount = parseInt(this.request.body.amount);
     var userid = this.request.body.userid;
     var result = yield infectservice.pingPay(amount,userid);
+    console.log(result);
     var data = {};
     data.charge = JSON.stringify(result);
     this.body = {'head':{code: 200,msg:'success'},'data':data};

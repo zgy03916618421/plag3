@@ -353,6 +353,7 @@ exports.speedComment = function *(userid,vid,commemt) {
     mongodb.collection('speedcomment').insertOne({'userid':userid,'vid':vid,'comment':commemt});
 }
 exports.pingPay = function *(amount,userid) {
+    console.log('here');
     var opt = {
         subject:"test",
         body : userid,
@@ -367,10 +368,12 @@ exports.pingPay = function *(amount,userid) {
     return result;
 }
 exports.webHooks = function *(type,order) {
+    console.log('here');
     var userid = order.object.body;
     var amount = parseInt(order.object.amount);
     if(type == "charge.succeeded"){
-        yield mongodb.collection('user').updateOne({'user_id':userid},{$inc:{"balance":amount*10}})
+        console.log('here')
+        yield mongodb.collection('user').updateOne({'user_id':userid},{$inc:{"balance":amount*10}});
         return {'head':{code: 200,msg:'success'}};
     }
 }

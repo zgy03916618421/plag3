@@ -2,7 +2,7 @@
  * Created by Administrator on 2016/10/24.
  */
 var pingConfig = require('../config/pingconfig');
-var key = pingConfig.testKey
+var key = pingConfig.liveKey
 var pingpp = require('pingpp')(key)
 exports.chargeCreate = function *(opt) {
     return new Promise(function (resolve,reject) {
