@@ -225,9 +225,9 @@ exports.getVirusById = function *() {
     var data = yield infectservice.getVirusById(vid);
     this.body = data;
 }
-/*
 exports.pingPay = function *() {
-    var amount = this.request.body.amount;
-    var data = yield infectservice.pingPay(amount);
-    
-}*/
+    var amount = parseInt(this.request.body.amount);
+    var ip = this.request.ip;
+    var data = yield infectservice.pingPay(amount,ip);
+    this.body = {'head':{code: 300,msg:'success'},'data':data};
+}

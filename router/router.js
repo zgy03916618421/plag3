@@ -27,4 +27,5 @@ router.get('/virusdetail/:vid',C.getVirusById);
 router.get('/myviruslist',C.myViruslist);
 router.get('/myspeedlist',C.mySpeedlist);
 router.post('/speedcomment',C.speedComment);
+router.post('/pingpay',C.pingPay);
 module.exports = router

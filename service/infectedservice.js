@@ -6,7 +6,8 @@ var md5 = require('MD5')
 var underscore = require('underscore')
 var ObjectID = require('mongodb').ObjectID
 var redisTemplate = require('../db/redisTemplate');
-/*var pingUtil = require('./pingppUtil');*/
+var pingUtil = require('./pingppUtil');
+var pingConfig = require('../config/pingconfig');
 exports.getVirus = function *(userid) {
     var total = yield mongodb.collection('order').find().toArray();
     var orders = underscore.filter(total,function (data) {
@@ -351,9 +352,17 @@ exports.mySpeedlist = function *(userid,skip,limit) {
 exports.speedComment = function *(userid,vid,commemt) {
     mongodb.collection('speedcomment').insertOne({'userid':userid,'vid':vid,'comment':commemt});
 }
-/*
-exports.pingPay = function *(amount) {
+exports.pingPay = function *(amount,ip) {
     var opt = {
-
+        subject:"test",
+        body : "plag test",
+        amount:amount,
+        order_no:md5(new Date()),
+        channel:"alipay",
+        currency:"cny",
+        client_ip:"127.0.0.1",
+        app:{id:pingConfig.appID}
     }
-}*/
+    var result = yield pingUtil.chargeCreate(opt);
+    return result;
+}
