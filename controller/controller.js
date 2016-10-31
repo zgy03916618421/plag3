@@ -228,9 +228,10 @@ exports.getVirusById = function *() {
 exports.pingPay = function *() {
     var amount = parseInt(this.request.body.amount);
     var ip = this.request.ip;
-    var data = yield infectservice.pingPay(amount,ip);
+    var result = yield infectservice.pingPay(amount,ip);
+    data.charge = stringify(result);
     this.body = {'head':{code: 300,msg:'success'},'data':data};
 }
 exports.webHooks = function *() {
-    
+
 }
