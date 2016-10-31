@@ -230,7 +230,7 @@ exports.pingPay = function *() {
     var ip = this.request.ip;
     var result = yield infectservice.pingPay(amount,ip);
     var data = {};
-    data.charge = stringify(result);
+    data.charge = JSON.stringify(result);
     this.body = {'head':{code: 300,msg:'success'},'data':data};
 }
 exports.webHooks = function *() {
