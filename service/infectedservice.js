@@ -369,7 +369,7 @@ exports.pingPay = function *(amount,userid) {
 exports.webHooks = function *(type,order) {
     var userid = order.object.body;
     var amount = order.object.amount;
-    if(type == charge.succeeded){
+    if(type == "charge.succeeded"){
         mongodb.collection('user').updateOne({'uesr_id':userid},{$inc:{balance:amount*10}})
         return {'head':{code: 200,msg:'success'}};
     }
