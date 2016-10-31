@@ -370,9 +370,10 @@ exports.webHooks = function *(type,order) {
     var userid = order.object.body;
     console.log(userid);
     var amount = parseInt(order.object.amount);
+    console.log(amount);
     if(type == "charge.succeeded"){
         console.log('here')
-        mongodb.collection('user').updateOne({'uesr_id':userid},{$inc:{balance:amount*10}})
+        mongodb.collection('user').updateOne({'uesr_id':userid},{$inc:{"balance":amount*10}})
         return {'head':{code: 200,msg:'success'}};
     }
 }
