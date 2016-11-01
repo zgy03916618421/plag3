@@ -296,7 +296,7 @@ function *infects_stats_before_ts(ts) {
         "users-count": userCount,
         "total-virus": count,
         "average-infected": infects.reduce(function(a, b) {return a + b}) / (infects.length || 1),
-        "max-infected": infects[0]
+        "max-infected": infects[1]
     }
 }
 function range2(n) {return n? range2(n-1).concat(Math.pow(2, n)):[]}
