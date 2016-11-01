@@ -241,3 +241,67 @@ exports.webHooks = function *() {
     var data = yield infectservice.webHooks(type,order);
     this.body = data;
 }
+exports.usercontent = function *() {
+    var users = yield mongodb.collection('user').find({createtime: {$exists: true}}, {_id: 0, createtime: 1})
+        .sort({ createtime: 1}).toArray();
+    users = users.map(function (doc) {
+        return doc.createtime;
+    })
+    var n = 17;
+    var num = range2(n).map(function (n) {
+        if(n == Math.pow(2,17)){
+            return  Date.parse(users[users.length-1]);
+        }else{
+            return users[n];
+        }
+
+    });
+    console.log(num);
+    for(let i =0 ;i<num.length;i++){
+        let doc = yield infects_stats_before_ts(num[i]);
+        yield mongodb.collection('usercontent').insertOne(doc);
+    }
+
+}
+function *virus_before_ts(ts) {
+    var count = yield mongodb.collection('virus').count({createtime: {$lt: ts}})
+    return count
+}
+function *infects_stats_before_ts(ts) {
+    var ifs = yield mongodb.collection('infected').aggregate([
+        {
+            $match: {
+                createtime: {$lt: ts}
+            }
+        },
+        {
+            $group: {
+                _id: "$vid",
+                count: {$sum : 1}
+            }
+        },
+        {
+            $sort: {
+                count: -1
+            }
+        }
+    ]).toArray();
+    let infects = ifs.map(function (doc) {
+        return doc.count;
+    })
+    var count = yield virus_before_ts(ts);
+    var userCount = yield mongodb.collection('user').count({'createtime':{$lt:ts}});
+    return {
+        "time-stamp": ts,
+        "users-count": userCount,
+        "total-virus": count,
+        "average-infected": infects.reduce(function(a, b) {return a + b}) / (infects.length || 1),
+        "max-infected": infects[0]
+    }
+}
+function range2(n) {return n? range2(n-1).concat(Math.pow(2, n)):[]}
+function *stats(n) {
+    return range2(n)
+        .map(function(n) {return users_ts[n]})
+        .map(function(ts) {return infects_stats_before_ts(ts)})
+}

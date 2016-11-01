@@ -3,7 +3,7 @@
  */
 var config = require('../config/qiniuconfig');
 var qiniu = require('node-qiniu');
-exports.qiniuhost = 'http://' + config.domain + '/';
+exports.qiniuhost = 'https://' + config.domain + '/';
 qiniu.config({
     access_key : config.access_key,
     secret_key : config.secret_key
