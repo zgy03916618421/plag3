@@ -29,19 +29,33 @@ exports.anonyLogin = function *() {
 }
 exports.login = function *() {
     var userInfo = this.request.body;
-    var userid = userInfo.unionid;
-    var has = yield mongodb.collection('user').findOne({'unionid':userid});
-    if(!has){
-        userInfo.user_id = md5(new Date().valueOf());
+    if(userInfo.comefrom == 'bf'){
+        if(!userInfo.openid){
+            userInfo.openid = userInfo.user_id;
+        }
+        userInfo.headimgurl = userInfo.avatar;
         userInfo.createtime = new Date();
         userInfo.balance = parseInt(yield redisTemplate.get("balance"));
         userInfo.income = 0;
         userInfo.viruscount = 0;
         mongodb.collection('user').insertOne(userInfo);
-        this.body = {'head':{code: 200,msg:'new user create success'},'data':userInfo};
+        this.body = {'head':{code:200,msg:'success'},'data':userInfo}
     }else{
-        this.body = {'head':{code: 300,msg:'user has exist'},'data':has};
+        var userid = userInfo.unionid;
+        var has = yield mongodb.collection('user').findOne({'unionid':userid});
+        if(!has){
+            userInfo.user_id = md5(new Date().valueOf());
+            userInfo.createtime = new Date();
+            userInfo.balance = parseInt(yield redisTemplate.get("balance"));
+            userInfo.income = 0;
+            userInfo.viruscount = 0;
+            mongodb.collection('user').insertOne(userInfo);
+            this.body = {'head':{code: 200,msg:'new user create success'},'data':userInfo};
+        }else{
+            this.body = {'head':{code: 300,msg:'user has exist'},'data':has};
+        }
     }
+
 }
 exports.oauth = function *() {
     var code = this.query.code;
@@ -291,12 +305,18 @@ function *infects_stats_before_ts(ts) {
     })
     var count = yield virus_before_ts(ts);
     var userCount = yield mongodb.collection('user').count({'createtime':{$lt:ts}});
+    var spread = yield mongodb.collection('action').count({'createtime':{$lt:ts},'action':'spread'});
+    var skip = yield mongodb.collection('action').count({'createtime':{$lt:ts},'action':'skip'});
+    var speed = yield mongodb.collection('order').count({'createtime':{$lt:ts},'speed':true});
     return {
         "time-stamp": ts,
         "users-count": userCount,
         "total-virus": count,
         "average-infected": infects.reduce(function(a, b) {return a + b}) / (infects.length || 1),
-        "max-infected": infects[1]
+        "max-infected": infects[1],
+        "spread-count": spread,
+        "skip-count" : skip,
+        "speed-count" : speed
     }
 }
 function range2(n) {return n? range2(n-1).concat(Math.pow(2, n)):[]}
