@@ -60,11 +60,10 @@ exports.login = function *() {
 exports.oauth = function *() {
     var code = this.query.code;
     var redircetUrl = this.query.state;
-    redircetUrl = redircetUrl.split("/");
-    console.log(redircetUrl);
-    var _id = redircetUrl[5];
-    var vid = redircetUrl[6];
-    console.log(redircetUrl);
+    var url = redircetUrl.split('/');
+    console.log(url);
+    var _id = url[5];
+    var vid = url[6];
     var token = yield client.getAccessToken(code);
     var accessToken = token.data.access_token;
     var openid = token.data.openid;
@@ -90,7 +89,6 @@ exports.oauth = function *() {
             this.response.redirect(url[0]+'//'+url[2]+'/'+url[3]+'/'+url[4]+'/'+'?userid='+user.user_id+'&vid='+vid+'&_id='+_id);
         }
     }
-
 }
 exports.upPic = function *() {
         try{
