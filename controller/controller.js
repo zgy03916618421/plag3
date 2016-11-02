@@ -69,19 +69,26 @@ exports.oauth = function *() {
     var accessToken = token.data.access_token;
     var openid = token.data.openid;
     var userinfo = yield client.getUser(openid);
-    var user = yield mongodb.collection('user').find({'unionid':userinfo.unionid}).toArray();
-    if (!user.length){
-        userinfo.user_id = md5(new Date().valueOf());
+    var user = yield mongodb.collection('user').findOne({'unionid':userinfo.unionid});
+    if (!user){
+        userinfo.user_id = md5(new Date().valueOf()+Math.random());
         userinfo.createtime = Date.parse(new Date());
-        userinfo.balance =  parseInt(yield redisTemplate.get("balance"));
+        userinfo.balance = parseInt(yield redisTemplate.get("balance"));
         userinfo.income = 0;
         userinfo.viruscount = 0;
+        userinfo.createdate = new Date(userinfo.createtime);
         mongodb.collection('user').insertOne(userinfo);
-    }
-    if(redircetUrl.length<6){
-        this.response.redirect(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.user_id);
+        if(url.length<6){
+            this.response.redirect(redircetUrl+'?userid='+userinfo.user_id);
+        }else{
+            this.response.redirect(url[0]+'//'+url[2]+'/'+url[3]+'/'+url[4]+'/'+'?userid='+userinfo.user_id+'&vid='+vid+'&_id='+_id);
+        }
     }else{
-        this.response.redirect(redircetUrl[0]+'//'+redircetUrl[2]+'/'+redircetUrl[3]+'/'+redircetUrl[4]+'/'+'?userid='+userinfo.user_id+'&vid='+vid+'&_id='+_id);
+        if(url.length<6){
+            this.response.redirect(redircetUrl+'?userid='+user.user_id);
+        }else{
+            this.response.redirect(url[0]+'//'+url[2]+'/'+url[3]+'/'+url[4]+'/'+'?userid='+user.user_id+'&vid='+vid+'&_id='+_id);
+        }
     }
 
 }
