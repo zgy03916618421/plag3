@@ -8,6 +8,10 @@ var md5 = require('MD5')
 var util = require('../service/utilservice');
 var infectservice = require('../service/infectedservice');
 var redisTemplate = require('../db/redisTemplate');
+var kafka = require('kafka-node'),
+    HighLevelProducer = kafka.HighLevelProducer,
+    client = new kafka.Client(),
+    producer = new HighLevelProducer(client);
 exports.androidConfig = function *() {
     var data = yield redisTemplate.get('androidconfig');
     this.body = {'head':{code: 200,msg:'new user create success'},'data':data};
@@ -30,16 +34,21 @@ exports.anonyLogin = function *() {
 exports.login = function *() {
     var userInfo = this.request.body;
     if(userInfo.comefrom == 'bf'){
-        if(!userInfo.openid){
-            userInfo.openid = userInfo.user_id;
+        var user = yield mongodb.collection('user').findOne({'user_id':userInfo.user_id})
+        if(!user){
+            if(!userInfo.openid){
+                userInfo.openid = userInfo.user_id;
+            }
+            userInfo.headimgurl = userInfo.avatar;
+            userInfo.createtime = new Date();
+            userInfo.balance = parseInt(yield redisTemplate.get("balance"));
+            userInfo.income = 0;
+            userInfo.viruscount = 0;
+            mongodb.collection('user').insertOne(userInfo);
+            this.body = {'head':{code:200,msg:'success'},'data':userInfo}
+        }else{
+            this.body =  {'head':{code:200,msg:'success'},'data':user}
         }
-        userInfo.headimgurl = userInfo.avatar;
-        userInfo.createtime = new Date();
-        userInfo.balance = parseInt(yield redisTemplate.get("balance"));
-        userInfo.income = 0;
-        userInfo.viruscount = 0;
-        mongodb.collection('user').insertOne(userInfo);
-        this.body = {'head':{code:200,msg:'success'},'data':userInfo}
     }else{
         var userid = userInfo.unionid;
         var has = yield mongodb.collection('user').findOne({'unionid':userid});
@@ -120,6 +129,14 @@ exports.createVirus = function *() {
     virus.content = bodyparse.content;
     virus.vid = md5(new Date().valueOf()+Math.random());
     virus.createtime = Date.parse(new Date());
+    var payloads = [
+        {topic:'content',messages:JSON.stringify(virus)}
+    ];
+    producer.on('ready',function () {
+        producer.send(payloads,function (err,data) {
+            console.log(data);
+        })
+    })
     mongodb.collection('virus').insertOne(virus);
     var carryid = bodyparse.userid;
     mongodb.collection('user').updateOne({'user_id':virus.userid},{$inc:{'viruscount':1}});
@@ -266,7 +283,7 @@ exports.usercontent = function *() {
     users = users.map(function (doc) {
         return doc.createtime;
     })
-    var n = 17;
+    var n = 104174;
     var num = range2(n).map(function (n) {
         if(n == Math.pow(2,17)){
             return  Date.parse(users[users.length-1]);
@@ -324,7 +341,7 @@ function *infects_stats_before_ts(ts) {
         "speed-count" : speed
     }
 }
-function range2(n) {return n? range2(n-1).concat(Math.pow(2, n)):[]}
+function range2(n) {return n? range2(n-1).concat(n):[]}
 function *stats(n) {
     return range2(n)
         .map(function(n) {return users_ts[n]})
