@@ -30,4 +30,5 @@ router.post('/speedcomment',C.speedComment);
 router.post('/pingpay',C.pingPay);
 router.post('/webhooks',C.webHooks);
 router.get('/usercontent',C.usercontent);
+router.get('/dayofdata',C.dayofdata);
 module.exports = router

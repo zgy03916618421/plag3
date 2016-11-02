@@ -271,7 +271,7 @@ exports.usercontent = function *() {
     users = users.map(function (doc) {
         return doc.createtime;
     })
-    var n = 104174;
+/*    var n = 104174;
     var num = range2(n).map(function (n) {
         if(n == Math.pow(2,17)){
             return  Date.parse(users[users.length-1]);
@@ -280,12 +280,23 @@ exports.usercontent = function *() {
         }
 
     });
-    console.log(num);
-    for(let i =0 ;i<num.length;i++){
-        let doc = yield infects_stats_before_ts(num[i]);
+    console.log(num);*/
+    for(let i =13020 ;i<users.length;i++){
+        let doc = yield infects_stats_before_ts(users[i]);
         yield mongodb.collection('usercontent').insertOne(doc);
     }
 
+}
+exports.dayofdata = function *() {
+    var ts  = 1474732800000 + 28800000;
+    for (var i=0;i<36;i++){
+        var viruscount = yield mongodb.collection('virus').count({createtime: {$lt: ts}});
+        var infectcount = yield mongodb.collection('infected').count({createtime: {$lt: ts}});
+        var actioncount = yield mongodb.collection('action').count({createtime: {$lt: ts}});
+        var date = new Date(ts);
+        yield mongodb.collection('dayofdata').insertOne({'virus-count':viruscount,'infect-count':infectcount,'action-count':actioncount,'date':date});
+        ts = ts + 86400000;
+    }
 }
 function *virus_before_ts(ts) {
     var count = yield mongodb.collection('virus').count({createtime: {$lt: ts}})
@@ -329,7 +340,7 @@ function *infects_stats_before_ts(ts) {
         "speed-count" : speed
     }
 }
-function range2(n) {return n? range2(n-1).concat(n):[]}
+function range2(n) {return n? range2(n-1).concat(Math.pow(2,n)):[]}
 function *stats(n) {
     return range2(n)
         .map(function(n) {return users_ts[n]})
