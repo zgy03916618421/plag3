@@ -68,7 +68,7 @@ exports.oauth = function *() {
     var accessToken = token.data.access_token;
     var openid = token.data.openid;
     var userinfo = yield client.getUser(openid);
-    var user = yield mongodb.collection('user').findOne({'unionid':userinfo.unionid});
+    var user = yield mongodb.collection('user').findOne({'openid':userinfo.openid});
     if (!user){
         userinfo.user_id = md5(new Date().valueOf()+Math.random());
         userinfo.createtime = Date.parse(new Date());
