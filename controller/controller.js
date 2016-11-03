@@ -290,11 +290,33 @@ exports.usercontent = function *() {
 exports.dayofdata = function *() {
     var ts  = 1474732800000 + 28800000;
     for (var i=0;i<36;i++){
+        var usercount = yield mongodb.collection('user').count({createtime: {$lt: ts}});
         var viruscount = yield mongodb.collection('virus').count({createtime: {$lt: ts}});
         var infectcount = yield mongodb.collection('infected').count({createtime: {$lt: ts}});
         var actioncount = yield mongodb.collection('action').count({createtime: {$lt: ts}});
+        var ifs = yield mongodb.collection('infected').aggregate([
+            {
+                $match: {
+                    createtime: {$lt: ts}
+                }
+            },
+            {
+                $group: {
+                    _id: "$vid",
+                    count: {$sum : 1}
+                }
+            },
+            {
+                $sort: {
+                    count: -1
+                }
+            }
+        ]).toArray();
+        var infects = ifs.map(function (doc) {
+            return doc.count;
+        })
         var date = new Date(ts);
-        yield mongodb.collection('dayofdata').insertOne({'virus-count':viruscount,'infect-count':infectcount,'action-count':actioncount,'date':date});
+        yield mongodb.collection('dayofdata').insertOne({'user-count':usercount,'virus-count':viruscount,'infect-count':infectcount,'max-infect':infects[1],'action-count':actioncount,'date':date});
         ts = ts + 86400000;
     }
 }
