@@ -10,8 +10,8 @@ var config = {
         pass : process.env.BS_MONGOPASS || 'VFZPhT7y'
     },
     weixin : {
-        appID : 'wxdc041c85f0bf7b6f',
-        appsecret : '5bcb2ec82178f7085b449fcffe8b3816'
+        appID : 'wx9a66afce31e4ec8b',
+        appsecret : 'c2b679dbd1ea6c0ffc99155123a25697'
     },
     redis : {
         host: process.env.BS_REDISHOST || '192.168.100.2',
