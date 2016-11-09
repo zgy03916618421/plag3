@@ -335,7 +335,7 @@ exports.getJssdk = function *() {
         yield redisTemplate.set(key,data);
         yield redisTemplate.expire(key,6500);
     }
-    return data;
+    this.body = data;
 }
 function *virus_before_ts(ts) {
     var count = yield mongodb.collection('virus').count({createtime: {$lt: ts}})
