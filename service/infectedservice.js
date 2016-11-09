@@ -311,6 +311,8 @@ exports.myViruslist = function *(userid,skip,limit) {
         }else{
             virusList[i].speedCount = 0;
         }
+        var favor = yield mongodb.collection('action').count({'vid':vid,'action':'spread'});
+        virusList[i].favorCount = favor;
     }
     return virusList;
 }
@@ -345,6 +347,8 @@ exports.mySpeedlist = function *(userid,skip,limit) {
         }else{
             speedVirus[i].speedCount = 0;
         }
+        var favor = yield mongodb.collection('action').count({'vid':vid,'action':'spread'});
+        speedVirus[i].favorCount = favor;
         speedVirus[i].userinfo = yield mongodb.collection('user').findOne({'user_id':speedVirus[i].userid});
     }
     return speedVirus;
