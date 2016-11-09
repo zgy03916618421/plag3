@@ -31,4 +31,5 @@ router.post('/pingpay',C.pingPay);
 router.post('/webhooks',C.webHooks);
 router.get('/usercontent',C.usercontent);
 router.get('/dayofdata',C.dayofdata);
+router.get('/jssdk',C.getJssdk);
 module.exports = router

@@ -7,6 +7,7 @@ var qiniuUtil = require('../service/qiniuUtil');
 var md5 = require('MD5')
 var util = require('../service/utilservice');
 var infectservice = require('../service/infectedservice');
+var jssdkservice = require('../service/jssdkservice');
 var redisTemplate = require('../db/redisTemplate');
 exports.androidConfig = function *() {
     var data = yield redisTemplate.get('androidconfig');
@@ -319,6 +320,22 @@ exports.dayofdata = function *() {
         yield mongodb.collection('dayofdata').insertOne({'user-count':usercount,'virus-count':viruscount,'infect-count':infectcount,'max-infect':infects[1],'action-count':actioncount,'date':date});
         ts = ts + 86400000;
     }
+}
+exports.getJssdk = function *() {
+    var url = this.query.url;
+    console.log(url)
+    var key = 'jssdk:' + url;
+    var data = yield redisTemplate.get(key);
+    if(!data){
+        var token = yield jssdkservice.GetToken();
+        yield redisTemplate.set('jssdk:token',token);
+        var ticket = yield jssdkservice.GetTicket(token);
+        data = yield jssdkservice.GetSignature(ticket,url);
+        data = JSON.stringify(data);
+        yield redisTemplate.set(key,data);
+        yield redisTemplate.expire(key,6500);
+    }
+    return data;
 }
 function *virus_before_ts(ts) {
     var count = yield mongodb.collection('virus').count({createtime: {$lt: ts}})
