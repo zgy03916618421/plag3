@@ -397,7 +397,7 @@ exports.path = function *(vid,userid) {
         var user = users.filter(function (doc) {
             return doc.user_id == item
         })
-        list.push(user);
+        list.push(user[0]);
     })
     return list;
 }
