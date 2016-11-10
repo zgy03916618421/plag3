@@ -327,8 +327,12 @@ exports.getJssdk = function *() {
     var key = 'jssdk:' + url;
     var data = yield redisTemplate.get(key);
     if(!data){
-        var token = yield jssdkservice.GetToken();
-        yield redisTemplate.set('jssdk:token',token);
+        var token = yield redisTemplate.get('jssdk:token');
+        if(!token){
+            token = yield jssdkservice.GetToken();
+            yield redisTemplate.set('jssdk:token',token);
+            yield redisTemplate.expire("jssdk:token",6500);
+        }
         var ticket = yield jssdkservice.GetTicket(token);
         data = yield jssdkservice.GetSignature(ticket,url);
         data = JSON.stringify(data);
