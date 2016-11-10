@@ -199,7 +199,7 @@ exports.path = function *() {
     var userid = this.params.userid;
     console.log(vid);
     console.log(userid);
-    var path = yield infectservice.path(vid,userid);
+    var path = yield infectservice.path(vid,userid)
     this.body = {'path':path};
 }
 exports.tree = function *() {

@@ -381,3 +381,23 @@ exports.webHooks = function *(type,order) {
         return {'head':{code: 200,msg:'success'}};
     }
 }
+exports.path = function *(vid,userid) {
+    var path = [];
+    while (1){
+        var parentInfect = yield mongodb.collection('infected').findOne({'infectid':userid,'vid':vid});
+        if(parentInfect.carryid == parentInfect.infectid){
+            break;
+        }
+        path.push(parentInfect.carryid);
+        userid = parentInfect.carryid;
+    }
+    var users = yield mongodb.collection('user').find({'user_id':{$in:path}}).toArray();
+    var list = [];
+    var loop = path.map(function (item) {
+        var user = users.filter(function (doc) {
+            return doc.user_id == item
+        })
+        list.push(user);
+    })
+    return list;
+}
