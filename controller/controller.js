@@ -63,10 +63,11 @@ exports.login = function *() {
     }
 
 }
-exports.oauth = function *() {
+/*exports.oauth = function *() {
     var code = this.query.code;
     var redircetUrl = this.query.state;
     var url = redircetUrl.split('/');
+
     console.log(url);
     var _id = url[5];
     var vid = url[6];
@@ -95,6 +96,11 @@ exports.oauth = function *() {
             this.response.redirect(url[0]+'//'+url[2]+'/'+url[3]+'/'+url[4]+'/'+'?userid='+user.user_id+'&vid='+vid+'&_id='+_id);
         }
     }
+}*/
+exports.oauth = function *() {
+    var code = this.query.code;
+    var redircetUrl = this.query.state;
+
 }
 exports.upPic = function *() {
         try{
@@ -328,6 +334,7 @@ exports.getJssdk = function *() {
     var data = yield redisTemplate.get(key);
     if(!data){
         var token = yield redisTemplate.get('jssdk:token');
+        console.log(token);
         if(!token){
             token = yield jssdkservice.GetToken();
             yield redisTemplate.set('jssdk:token',token);

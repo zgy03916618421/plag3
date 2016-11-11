@@ -147,13 +147,14 @@ exports.getVirusV2 = function *(userid) {
         return {'head':{code:200,msg:'success'},'data':data};
     }
 }
-exports.speedV4 = function *(vid,userid) {
+/*exports.speedV4 = function *(vid,userid) {
     var user = yield mongodb.collection('user').findOne({'user_id':userid});
     if(user.balance < 100){
         return {'head':{code:600,msg:'no balance'},'data':{balance:user.balance}};
     }else{
         mongodb.collection('user').updateOne({'user_id':userid},{$inc:{'balance':-100}});
         var time = Date.parse(new Date());
+        
         var users = yield mongodb.collection('order').find({$and:[{vid:vid},{speed:true},{createtime:{$lt:time}}]},{userid:1}).toArray();
         var us = users.map(function (doc) {
             return doc.userid;
@@ -166,6 +167,102 @@ exports.speedV4 = function *(vid,userid) {
             yield mongodb.collection('user').updateOne({'user_id':source.userid},{$inc:{'income':100,'balance':100}});
         }
         return {'head':{code: 200,msg:'success'},'data':{balance:user.balance-100}}
+    }
+}*/
+/*exports.speedV4 = function *(vid,userid) {
+    var user = yield mongodb.collection('user').findOne({'user_id':userid});
+    var time = Date.parse(new Date());
+    var source = yield mongodb.collection('virus').findOne({'vid':vid});
+    if(user.balance < 100){
+        return {'head':{code:600,msg:'no balance'},'data':{balance:user.balance}};
+    }else{
+        yield mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':-100}});
+        var path = [];
+        while (1){
+            var parentInfect = yield mongodb.collection('infected').findOne({'infectid':userid,'vid':vid,'carryid':{$ne:null}});
+            
+            var parentOrder = yield mongodb.collection('order').findOne({'userid':parentInfect.carryid,'vid':vid});
+            
+            if(parentInfect.carryid == parentInfect.infectid){
+                break;
+            }
+            if(parentOrder.speed == true){
+                path.push(parentOrder.userid);
+                break
+            }
+            userid = parentInfect.carryid;
+        }
+        if(!path.length){
+            var users = yield mongodb.collection('order').find({$and:[{vid:vid},{speed:true},{createtime:{$lt:time}}]},{userid:1}).toArray();
+            var us = users.map(function (doc) {
+                return doc.userid;
+            })
+            yield mongodb.collection('user').updateMany({'user_id':{$in:us}},{$inc:{'income':parseInt(50/(users.length)),'balance':parseInt(50/(users.length))}});
+            yield mongodb.collection('user').updateOne({'user_id':source.userid},{$inc:{'income':50,'balance':50}});
+        }else{
+            var users = yield mongodb.collection('order').find({$and:[{vid:vid},{speed:true},{createtime:{$lt:time}}]},{userid:1}).toArray();
+            var us = users.map(function (doc) {
+                return doc.userid;
+            })
+            yield mongodb.collection('user').updateMany({'user_id':{$in:us}},{$inc:{'income':parseInt(30/(users.length)),'balance':parseInt(30/(users.length))}});
+            yield mongodb.collection('user').updateOne({'user_id':source.userid},{$inc:{'income':20,'balance':20}});
+            yield mongodb.collection('user').updateOne({'user_id':path[0]},{$inc:{'income':50,'balance':50}});
+        }
+        return {'head':{code: 200,msg:'success'},'data':{balance:user.balance}};
+    }
+}*/
+exports.speedV4 = function *(vid,userid) {
+    var user = yield mongodb.collection('user').findOne({'user_id':userid});
+    if(user.balance < 100){
+        return {'head':{code:600,msg:'no balance'},'data':{balance:user.balance}};
+    }else{
+        var time = Date.parse(new Date());
+        var source = yield mongodb.collection('virus').findOne({'vid':vid});
+        yield mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':-100}});
+        var path = [];
+        while (1){
+            var parentInfect = yield mongodb.collection('infected').findOne({'infectid':userid,'vid':vid,'carryid':{$ne:null}});
+
+            var parentOrder = yield mongodb.collection('order').findOne({'userid':parentInfect.carryid,'vid':vid});
+
+            if(parentInfect.carryid == parentInfect.infectid){
+                break;
+            }
+            if(parentOrder.speed == true){
+                path.push(parentOrder.userid);
+                break
+            }
+            userid = parentInfect.carryid;
+        }
+        if(!path.length){
+            var users = yield mongodb.collection('order').find({$and:[{vid:vid},{speed:true},{createtime:{$lt:time}}]},{userid:1}).toArray();
+            var us = users.map(function (doc) {
+                return doc.userid;
+            })
+            if(!us){
+                yield mongodb.collection('user').updateOne({'openid':source.userid},{$inc:{'income':100,'balance':100}});
+            }else{
+                yield mongodb.collection('user').updateMany({'openid':{$in:us}},{$inc:{'income':parseInt(50/(us.length)),'balance':parseInt(50/(us.length))}});
+                yield mongodb.collection('user').updateOne({'openid':source.userid},{$inc:{'income':50,'balance':50}});
+            }
+        }else{
+            var users = yield mongodb.collection('order').find({$and:[{vid:vid},{speed:true},{createtime:{$lt:time}}]},{userid:1}).toArray();
+            var us = users.filter(function (doc) {
+                return doc.userid!=path[0];
+            })
+            us = us.map(function (doc) {
+                return doc.userid;
+            })
+            if(!us){
+                yield mongodb.collection('user').updateOne({'openid':source.userid},{$inc:{'income':50,'balance':50}});
+                yield mongodb.collection('user').updateOne({'openid':path[0]},{$inc:{'income':50,'balance':50}});
+            }else{
+                yield mongodb.collection('user').updateMany({'openid':{$in:us}},{$inc:{'income':parseInt(30/(us.length)),'balance':parseInt(30/(us.length))}});
+                yield mongodb.collection('user').updateOne({'openid':source.userid},{$inc:{'income':20,'balance':20}});
+                yield mongodb.collection('user').updateOne({'openid':path[0]},{$inc:{'income':50,'balance':50}});
+            }
+        }
+        return {'head':{code: 200,msg:'success'},'data':{balance:user.balance}};
     }
 }
 exports.tree = function *(vid) {
@@ -201,7 +298,7 @@ exports.tree = function *(vid) {
 }
 exports.getshareVirus = function *(carryid,vid,userid) {
     var virus = yield mongodb.collection('virus').findOne({'vid':vid});
-    var userinfo = yield mongodb.collection('user').findOne({'openid':virus.userid});
+    var userinfo = yield mongodb.collection('user').findOne({'user_id':virus.userid});
     var patients = yield mongodb.collection('infected').find({'vid':vid}).toArray();
     var favor = yield mongodb.collection('action').find({'vid':vid,'action':'spread'}).toArray();
     var carry = yield mongodb.collection('user').findOne({'_id':ObjectID.createFromHexString(carryid)})
@@ -383,6 +480,7 @@ exports.webHooks = function *(type,order) {
 }
 exports.path = function *(vid,userid) {
     var path = [];
+    path.push(userid)
     while (1){
         var parentInfect = yield mongodb.collection('infected').findOne({'infectid':userid,'vid':vid});
         if(parentInfect.carryid == parentInfect.infectid){
@@ -399,5 +497,10 @@ exports.path = function *(vid,userid) {
         })
         list.push(user[0]);
     })
-    return list;
+    for (var i =0;i<list.length;i++){
+        var order = yield mongodb.collection('order').findOne({"userid":list[i].openid,"vid":vid});
+        console.log(order);
+        list[i].speed = order ? false : order.speed;
+    }
+    return list.reverse();
 }
