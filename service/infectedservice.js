@@ -313,8 +313,10 @@ exports.getshareVirus = function *(carryid,vid,userid) {
     var data = {};
     data.virus = virus;
     data.userinfo = userinfo;
-    data.patientNumber = patients.length;
-    data.favorCount = favor.length;
+    data.virus.scanCount = patients.length;
+    data.virus.favorCount = favor.length;
+    data.virus.speedCount = yield mongodb.collection('order').count({"vid":order.vid,"speed":true});
+
     return {'head':{code:200,msg:'success'},'data':data};
 }
 exports.graph = function *(vid) {
