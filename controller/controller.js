@@ -100,6 +100,25 @@ exports.login = function *() {
 exports.oauth = function *() {
     var code = this.query.code;
     var redircetUrl = this.query.state;
+    var index = redircetUrl.indexOf('=');
+    var source = redircetUrl.substr(index+1);
+    var token = yield client.getAccessToken(code);
+    var accessToken = token.data.access_token;
+    var openid = token.data.openid;
+    var userinfo = yield client.getUser(openid);
+    var user = yield mongodb.collection('user').findOne({'openid':userinfo.openid});
+    if(!user){
+        userinfo.user_id = md5(new Date().valueOf()+Math.random());
+        userinfo.createtime = Date.parse(new Date());
+        userinfo.balance = parseInt(yield redisTemplate.get("balance"));
+        userinfo.income = 0;
+        userinfo.viruscount = 0;
+        userinfo.createdate = new Date(userinfo.createtime);
+        userinfo.comefrom = source;
+        mongodb.collection('user').insertOne(userinfo);
+    }
+    var redurl = redircetUrl.substr(0,redircetUrl.indexOf('?'));
+    this.response.redirect(redurl+'?userid='+userinfo.user_id);
 
 }
 exports.upPic = function *() {

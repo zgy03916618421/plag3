@@ -1,6 +1,7 @@
 /**
  * Created by Administrator on 2016/9/27.
  */
+/*
 var md5 = require('MD5')
 var MongoClient = require('mongodb').MongoClient;
 MongoClient.connect('mongodb://plag:xLuYMSgJ@192.168.200.22:27017/plag',function (err,db) {
@@ -30,4 +31,8 @@ MongoClient.connect('mongodb://plag:xLuYMSgJ@192.168.200.22:27017/plag',function
             })
         }
     })
-})
+})*/
+var url = 'http://www.baidu.com/?a=b';
+var a = url.indexOf('?');
+var b = url.substr(0,a);
+console.log(b);
