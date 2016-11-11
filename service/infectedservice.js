@@ -315,7 +315,7 @@ exports.getshareVirus = function *(carryid,vid,userid) {
     data.userinfo = userinfo;
     data.virus.scanCount = patients.length;
     data.virus.favorCount = favor.length;
-    data.virus.speedCount = yield mongodb.collection('order').count({"vid":order.vid,"speed":true});
+    data.virus.speedCount = yield mongodb.collection('order').count({"vid":vid,"speed":true});
 
     return {'head':{code:200,msg:'success'},'data':data};
 }
