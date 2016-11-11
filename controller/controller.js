@@ -116,9 +116,12 @@ exports.oauth = function *() {
         userinfo.createdate = new Date(userinfo.createtime);
         userinfo.comefrom = source;
         mongodb.collection('user').insertOne(userinfo);
+        var redurl = redircetUrl.substr(0,redircetUrl.indexOf('?'));
+        this.response.redirect(redurl+'?userid='+userinfo.user_id);
+    }else{
+        this.response.redirect(redircetUrl+'?userid='+user.user_id);
     }
-    var redurl = redircetUrl.substr(0,redircetUrl.indexOf('?'));
-    this.response.redirect(redurl+'?userid='+userinfo.user_id);
+
 
 }
 exports.upPic = function *() {
