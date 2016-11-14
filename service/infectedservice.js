@@ -218,7 +218,7 @@ exports.speedV4 = function *(vid,userid) {
     }else{
         var time = Date.parse(new Date());
         var source = yield mongodb.collection('virus').findOne({'vid':vid});
-        yield mongodb.collection('user').updateOne({'openid':userid},{$inc:{'balance':-100}});
+        yield mongodb.collection('user').updateOne({'user_id':userid},{$inc:{'balance':-100}});
         var path = [];
         while (1){
             var parentInfect = yield mongodb.collection('infected').findOne({'infectid':userid,'vid':vid,'carryid':{$ne:null}});
