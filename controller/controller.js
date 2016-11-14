@@ -158,13 +158,18 @@ exports.createVirus = function *() {
     virus.content = bodyparse.content;
     virus.vid = md5(new Date().valueOf()+Math.random());
     virus.createtime = Date.parse(new Date());
+    var kafka = require('kafka-node')
+    var Producer = kafka.Producer;
+    var client = new kafka.Client('192.168.100.2:2181');
+    var producer = new Producer(client);
     var payloads = [
-        {topic:'content',messages:JSON.stringify(virus)}
+        { topic: 'content', messages: JSON.stringify({'appid': 'b35a7555-6752-47f0-831e-11f9c2074e4c', 'userId': virus.userid, 'type': virus.type, 'content': virus.content, 'vid': virus.vid, 'timeCreated': virus.createtime}), partition: 0 },
     ];
-    producer.on('ready',function () {
-        producer.send(payloads,function (err,data) {
-        })
-    })
+    producer.on('ready', function () {
+        producer.send(payloads, function (err, data) {
+            console.log(data);
+        });
+    });
     mongodb.collection('virus').insertOne(virus);
     var carryid = bodyparse.userid;
     mongodb.collection('user').updateOne({'user_id':virus.userid},{$inc:{'viruscount':1}});
