@@ -158,12 +158,20 @@ exports.createVirus = function *() {
     virus.content = bodyparse.content;
     virus.vid = md5(new Date().valueOf()+Math.random());
     virus.createtime = Date.parse(new Date());
+    var payloads = [
+        {topic:'content',messages:JSON.stringify(virus)}
+    ];
+    producer.on('ready',function () {
+        producer.send(payloads,function (err,data) {
+        })
+    })
     mongodb.collection('virus').insertOne(virus);
     var carryid = bodyparse.userid;
     mongodb.collection('user').updateOne({'user_id':virus.userid},{$inc:{'viruscount':1}});
     var data = {};
     data.virus = virus;
     data.userinfo = yield mongodb.collection('user').findOne({'user_id':virus.userid});
+    
     mongodb.collection('infected').insertOne({
         "carryid":carryid,
         "vid":virus.vid,
