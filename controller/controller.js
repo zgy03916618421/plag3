@@ -109,7 +109,6 @@ exports.oauth = function *() {
         redurl = redircetUrl.substr(0,index-2);
     }
     console.log(source);
-    var source = redircetUrl.substr(index+1);
     var token = yield client.getAccessToken(code);
     var accessToken = token.data.access_token;
     var openid = token.data.openid;
