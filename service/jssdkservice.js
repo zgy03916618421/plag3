@@ -44,6 +44,7 @@ exports.GetSignature = function *(ticket,URL) {
     sha1.update(sigString,'utf8');
     var signature = sha1.digest('hex');
     return {
+        "appid": config.weixin.appID,
         "timestamp" : timastamp,
         "jsapi_ticket" : jsapi_ticket,
         "noncestr" : noncestr,
