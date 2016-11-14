@@ -32,7 +32,14 @@ MongoClient.connect('mongodb://plag:xLuYMSgJ@192.168.200.22:27017/plag',function
         }
     })
 })*/
-var url = 'http://www.baidu.com/?a=b';
-var a = url.indexOf('?');
-var b = url.substr(0,a);
-console.log(b);
+var url = 'http://www.baidu.com';
+var index = url.indexOf('source=');
+if(index==-1){
+    var source = 'unkown';
+    var redUrl = url;
+}else{
+    source = url.substr(index+7);
+    redUrl = url.substr(0,index-2);
+}
+console.log(source);
+console.log(redUrl);

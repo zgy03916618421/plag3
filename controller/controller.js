@@ -100,7 +100,15 @@ exports.login = function *() {
 exports.oauth = function *() {
     var code = this.query.code;
     var redircetUrl = this.query.state;
-    var index = redircetUrl.indexOf('=');
+    var index = redircetUrl.indexOf('source=');
+    if(index==-1){
+        var source = 'unkown';
+        var redurl = redircetUrl;
+    }else{
+        source = redircetUrl.substr(index+7);
+        redurl = redircetUrl.substr(0,index-2);
+    }
+    console.log(source);
     var source = redircetUrl.substr(index+1);
     var token = yield client.getAccessToken(code);
     var accessToken = token.data.access_token;
@@ -116,13 +124,10 @@ exports.oauth = function *() {
         userinfo.createdate = new Date(userinfo.createtime);
         userinfo.comefrom = source;
         mongodb.collection('user').insertOne(userinfo);
-        var redurl = redircetUrl.substr(0,redircetUrl.indexOf('?'));
         this.response.redirect(redurl+'?userid='+userinfo.user_id);
     }else{
-        this.response.redirect(redircetUrl+'?userid='+user.user_id);
+        this.response.redirect(redurl+'?userid='+user.user_id);
     }
-
-
 }
 exports.upPic = function *() {
         try{
